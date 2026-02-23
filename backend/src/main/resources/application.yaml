@@ -1,3 +1,28 @@
 spring:
   application:
     name: tourplanner
+  servlet:
+    multipart:
+      max-file-size: "100MB"
+    session:
+      cookie:
+        secure: true
+  datasource:
+    url: "jdbc:h2:file:./tourplanner.db;AUTO_RECONNECT=TRUE;MODE=PostgreSQL;"
+    username: "sa"
+    password: "password"
+    #url: "jdbc:postgres://db/tourplanner"
+    #username: "tourplanner"
+    #password: "tourplanner"
+  h2:
+    console:
+      enabled: true
+  jpa:
+    generate-ddl: true
+    show-sql: true
+  devtools:
+    restart:
+      additional-paths: "templates/**,static/**"
+tourplanner:
+  domain: "https://nextgen.com"
+  rememberMeKey: "key"
