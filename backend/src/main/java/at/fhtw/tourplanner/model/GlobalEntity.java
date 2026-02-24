@@ -1,18 +1,23 @@
 package at.fhtw.tourplanner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
 @Entity
 @Getter
-public abstract class GlobalEntity extends AbstractPersistable<Long> {
-    /*@NotNull
-    private final String uuid = UUID.randomUUID().toString();*/
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@SuperBuilder
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@EqualsAndHashCode
+public abstract class GlobalEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.PROTECTED)
+    private UUID uuid;
+    @Version
+    private long version;
 }

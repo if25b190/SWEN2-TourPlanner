@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -19,11 +18,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor(onConstructor_ = @Autowired, access = AccessLevel.PROTECTED)
 public class WebSecurityConfig {
     @Value("tourplanner.domain")
@@ -34,6 +38,22 @@ public class WebSecurityConfig {
     private final UserService userService;
 
     @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                domain
+        ));
+        config.addAllowedHeader("*");
+        config.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
+        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/logout", config);
+        return new CorsFilter(source);
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
@@ -41,9 +61,10 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain configureRest(HttpSecurity httpSecurity) {
         return httpSecurity
-                .cors(conf -> conf.configure(httpSecurity))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(conf -> conf
+                        .requestMatchers("/h2-console/**")
+                        .hasRole("ADMIN")
                         .requestMatchers(
                                 "/api/v1/register"
                         ).permitAll()
@@ -54,8 +75,11 @@ public class WebSecurityConfig {
                             res.setStatus(200);
                             handleCors(req, res);
                         })
-                        .failureHandler((req, res, auth) -> {
+                        .failureHandler((req, res, exception) -> {
                             res.setStatus(400);
+                            Optional.of(exception)
+                                    .map(Throwable::getLocalizedMessage)
+                                    .ifPresent(res.getWriter()::append);
                             handleCors(req, res);
                         })
                         .loginPage("/api/v1/login")
@@ -74,11 +98,18 @@ public class WebSecurityConfig {
                 )
                 .rememberMe(conf -> conf
                         .key(rememberMeKey)
+                        .rememberMeParameter("remember-me")
                         .tokenValiditySeconds(5184000)
                         .useSecureCookie(true)
                 )
                 .exceptionHandling(conf -> conf
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .authenticationEntryPoint((req, res, exception) -> {
+                            res.setStatus(401);
+                            Optional.of(exception)
+                                    .map(Throwable::getLocalizedMessage)
+                                    .ifPresent(res.getWriter()::append);
+                            handleCors(req, res);
+                        })
                 )
                 .build();
     }
