@@ -13,8 +13,7 @@ import {Router} from "@angular/router";
     styleUrl: './register.scss'
 })
 export class Register implements OnInit {
-    EMAIL_REGEX = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-    email = model<String>('');
+    username = model<String>('');
     password = model<String>('');
     isRemember = model<boolean>(false);
 
@@ -24,8 +23,8 @@ export class Register implements OnInit {
     ngOnInit() {
     }
 
-    isEmailValid(): boolean {
-        return this.EMAIL_REGEX.test(this.email() as string);
+    isUsernameValid(): boolean {
+        return this.username().length >= 4;
     }
 
     isPasswordValid(): boolean {
@@ -33,11 +32,11 @@ export class Register implements OnInit {
     }
 
     isFormValid(): boolean {
-        return this.isEmailValid() && this.isPasswordValid();
+        return this.isUsernameValid() && this.isPasswordValid();
     }
 
     register() {
-        this.auth.register(this.email(), this.password(), res => {
+        this.auth.register(this.username(), this.password(), res => {
             if (res.status === 200) {
                 this.toastr.success("Account registered successfully!");
                 this.login();
@@ -50,9 +49,9 @@ export class Register implements OnInit {
     }
 
     login() {
-        this.auth.login(this.email(), this.password(), this.isRemember(), res => {
+        this.auth.login(this.username(), this.password(), this.isRemember(), res => {
             if (res.status === 400 || (res.body && res.body.includes("Account not found"))) {
-                this.toastr.error("Invalid email or password!");
+                this.toastr.error("Invalid username or password!");
             } else if (res.status === 200) {
                 this.router.navigate(['/']);
                 this.toastr.success("Logged in successfully!");
