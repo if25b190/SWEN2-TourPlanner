@@ -43,7 +43,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
+                "http://localhost:4200",
                 domain
         ));
         config.addAllowedHeader("*");
@@ -122,7 +122,7 @@ public class WebSecurityConfig {
     private void handleCors(HttpServletRequest request, HttpServletResponse response) {
         var origin = request.getHeader("origin");
         if (origin != null && (origin.contains("localhost") || origin.contains("127.0.0.1"))) {
-            response.addHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+            response.addHeader("Access-Control-Allow-Origin", "http://localhost:4200");
         } else {
             response.addHeader("Access-Control-Allow-Origin", domain);
         }

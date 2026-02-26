@@ -15,10 +15,10 @@
                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                         </g>
                     </svg>
-                    <input type="email" placeholder="Email" [(ngModel)]="email" required/>
+                    <input type="text" placeholder="Username" [(ngModel)]="username" required/>
                 </label>
-                <div class="validator-hint mb-3 form-error" [style.display]="(isEmailValid()) ? 'none' : 'block'">Enter
-                    valid email address
+                <div class="validator-hint mb-3 form-error" [style.display]="(isUsernameValid()) ? 'none' : 'block'">Enter
+                    valid username
                 </div>
                 <label class="input">
                     <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

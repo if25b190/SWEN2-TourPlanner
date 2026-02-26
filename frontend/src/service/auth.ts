@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpResponse} from "@angular/common/http";
-import {Router} from "@angular/router";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams, HttpResponse } from "@angular/common/http";
+import { Router } from "@angular/router";
 
 @Injectable({
     providedIn: 'root'
@@ -9,9 +9,9 @@ export class AuthService {
     constructor(private router: Router, private http: HttpClient) {
     }
 
-    register(email: String, password: String, callback: (res: HttpResponse<String>) => void) {
-        this.http.post('/register', {
-            email: email,
+    register(username: String, password: String, callback: (res: HttpResponse<String>) => void) {
+        this.http.post('http://localhost:8080/api/v1/register', {
+            username: username,
             password: password
         }, {
             observe: 'response',
@@ -27,22 +27,21 @@ export class AuthService {
         });
     }
 
-    login(email: String, password: String, isRemember: boolean, callback: (res: HttpResponse<String>) => void) {
-        this.http.post('/login', {
-            email: email,
-            password: password
-        }, {
+    login(username: String, password: String, isRemember: boolean, callback: (res: HttpResponse<String>) => void) {
+        const formData = new HttpParams().set('username', username as string).set('password', password as string);
+        this.http.post('http://localhost:8080/api/v1/login', formData.toString(), {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
         }).subscribe({
             next: (res: HttpResponse<String>) => {
                 if (isRemember) {
                     localStorage.setItem("isLoggedIn", "true");
-                    localStorage.setItem("currentEmail", email.toString());
                 } else {
                     sessionStorage.setItem("isLoggedIn", "true");
-                    sessionStorage.setItem("currentEmail", email.toString());
                 }
                 callback(res);
             },
@@ -53,7 +52,7 @@ export class AuthService {
     }
 
     logout() {
-        this.http.get('/logout', {
+        this.http.get('http://localhost:8080/api/v1/logout', {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
@@ -62,14 +61,12 @@ export class AuthService {
                 this.router.navigate(['/register']);
                 sessionStorage.removeItem("isLoggedIn");
                 localStorage.removeItem("isLoggedIn");
-                sessionStorage.removeItem("currentEmail");
-                localStorage.removeItem("currentEmail");
             }
         });
     }
 
     update(email: String, password: String, passwordOld: String, callback: (res: HttpResponse<String>) => void) {
-        this.http.post('/profile', {
+        this.http.post('http://localhost:8080/api/v1/profile', {
             email: email,
             password: password,
             passwordOld: passwordOld
@@ -95,7 +92,7 @@ export class AuthService {
     }
 
     delete(callback: (res: HttpResponse<String>) => void) {
-        this.http.delete('/delete', {
+        this.http.delete('http://localhost:8080/api/v1/delete', {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
