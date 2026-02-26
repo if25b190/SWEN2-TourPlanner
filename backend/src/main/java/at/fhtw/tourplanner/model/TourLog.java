@@ -1,13 +1,12 @@
 package at.fhtw.tourplanner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDateTime;
 
@@ -17,11 +16,12 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class TourLog extends GlobalEntity {
+public class TourLog extends GlobalEntity implements Serializable {
     @NonNull
     private String creator;
     @NonNull
-    private Integer tourId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Tour tour;
     @NonNull
     private LocalDateTime creationDate;
     @NonNull
