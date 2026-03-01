@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: backend/Dockerfile
+      dockerfile: ./Dockerfile
     restart: unless-stopped
     depends_on:
       db:
@@ -12,7 +12,8 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: frontend/Dockerfile
+      dockerfile: ./Dockerfile
+      network: host
     restart: unless-stopped
     ports:
       - "8081:8081"

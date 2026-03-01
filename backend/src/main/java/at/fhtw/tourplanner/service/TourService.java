@@ -1,10 +1,7 @@
 package at.fhtw.tourplanner.service;
 
-import at.fhtw.tourplanner.dto.LoginDto;
 import at.fhtw.tourplanner.dto.TourDto;
-import at.fhtw.tourplanner.model.Tour;
 import at.fhtw.tourplanner.repository.TourRepository;
-import at.fhtw.tourplanner.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,12 +21,18 @@ import java.util.UUID;
 public class TourService {
     private final TourRepository tourRepository;
 
-    public Optional<ArrayList<Tour>> getAllToursOfUser(String username) {
-        return tourRepository.getAllToursOfUser(username);
+    //TODO user check
+    public Optional<ArrayList<TourDto>> getAllToursOfUser(String username) {
+        return tourRepository.getAllToursByCreator(username)
+                .map(tours -> (ArrayList<TourDto>) tours.stream()
+                        .map(TourDto::fromEntity)
+                        .collect(Collectors.toList()));
     }
 
-    public Optional<Tour> getTourByUuid(UUID uuid) {
-        return tourRepository.getTourByUuid(uuid);
+    //TODO user check
+    public Optional<TourDto> getTourByUuid(UUID uuid) {
+        return tourRepository.getTourByUuid(uuid)
+                .map(TourDto::fromEntity);
     }
 
     public Optional<TourDto> addTour(TourDto tourDto) {
@@ -41,7 +45,7 @@ public class TourService {
     //TODO user check
     public Optional<TourDto> updateTour(TourDto tourDto) {
         return Optional.ofNullable(tourDto)
-                .map(dto -> tourRepository.getTourByUuid(UUID.fromString(tourDto.uuid())))
+                .map(_ -> tourRepository.getTourByUuid(UUID.fromString(tourDto.uuid())))
                 .filter(Optional::isPresent)
                 .map(_ -> TourDto.toEntity(tourDto))
                 .map(tourRepository::save)

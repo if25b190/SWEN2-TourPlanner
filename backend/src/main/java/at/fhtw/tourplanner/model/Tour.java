@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.sql.Time;
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,9 +24,17 @@ public class Tour extends GlobalEntity implements Serializable {
     private String description;
     @NonNull
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "longitude", column = @Column(name = "from_longitude")),
+            @AttributeOverride(name = "latitude", column = @Column(name = "from_latitude"))
+    })
     private MapPoint from;
     @NonNull
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "longitude", column = @Column(name = "to_longitude")),
+            @AttributeOverride(name = "latitude", column = @Column(name = "to_latitude"))
+    })
     private MapPoint to;
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -36,10 +44,13 @@ public class Tour extends GlobalEntity implements Serializable {
     @NonNull
     private Time estimatedTime;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private ArrayList<TourLog> logs;
+    private List<TourLog> logs;
     @NonNull
     private String creator;
 
+    @Data
+    @NoArgsConstructor
+    @SuperBuilder
     @Embeddable
     public static class MapPoint {
         @NonNull

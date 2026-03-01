@@ -1,8 +1,6 @@
 package at.fhtw.tourplanner.controller;
 
-import at.fhtw.tourplanner.dto.LoginDto;
 import at.fhtw.tourplanner.dto.TourDto;
-import at.fhtw.tourplanner.model.Tour;
 import at.fhtw.tourplanner.service.TourService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -12,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -20,16 +20,38 @@ import java.util.UUID;
 public class TourController {
     private final TourService tourService;
 
-    @GetMapping("")
-    public ResponseEntity<String> getAllTours() {
-        return ResponseEntity.ok("Hallo");
+    @GetMapping("/{username}")
+    public ResponseEntity<ArrayList<TourDto>> getAllTours(@PathVariable String username) {
+        var result = tourService.getAllToursOfUser(username);
+
+        if (result.isEmpty()) {
+            ResponseEntity.notFound();
+        }
+
+        return ResponseEntity.of(result);
     }
 
-    //TODO
+    @GetMapping("/{username}/{uuid}")
+    public ResponseEntity<TourDto> getTour(@PathVariable String username, @PathVariable String uuid) {
+        var result = tourService.getTourByUuid(UUID.fromString(uuid));
+
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        TourDto dto = result.get();
+
+        if(dto.creator().equals(username)) {
+            return ResponseEntity.of(result);
+        }
+
+        return ResponseEntity.status(403).body(null);
+    }
+
     @PostMapping("")
-    public ResponseEntity<TourDto> addTour(@Valid @RequestBody TourDto tourDto) {
+    public ResponseEntity<Optional<TourDto>> addTour(@Valid @RequestBody TourDto tourDto) {
         var result = tourService.addTour(tourDto);
-        return result.map(dto -> ResponseEntity.created(URI.create("/api/v1/tours")).body(tourDto))
+        return result.map(_ -> ResponseEntity.created(URI.create("/api/v1/tours")).body(result))
                 .orElse(ResponseEntity.badRequest().build());
     }
 
@@ -37,19 +59,18 @@ public class TourController {
     @PutMapping("")
     public ResponseEntity<TourDto> updateTour(@Valid @RequestBody TourDto tourDto) {
         var result = tourService.updateTour(tourDto);
-        return result.map(dto -> ResponseEntity.created(URI.create("/api/v1/tours")).body(tourDto))
+        return result.map(_ -> ResponseEntity.of(result))
                 .orElse(ResponseEntity.badRequest().build());
     }
 
     //TODO
     @DeleteMapping("/{uuid}")
     public ResponseEntity<String> deleteTour(@PathVariable String uuid) {
-        var result = tourService.deleteTour(uuid);
+        var result = tourService.deleteTour(UUID.fromString(uuid));
         if(result > 0) {
             return ResponseEntity.ok("Tour deleted");
-
-        }
-        else
+        } else {
             return ResponseEntity.badRequest().build();
+        }
     }
 }
