@@ -7,40 +7,30 @@
             <ul
                     tabindex="0"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li><a routerLink="">Tab 1</a></li>
-                <li><a routerLink="">Tab 2</a></li>
+                <li [hidden]="!isLogged()">
+                    <button routerLink="/tours" class="btn btn-outline">
+                        Your Tours
+                    </button>
+                </li>
+                <li [hidden]="!isLogged()"><input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" /></li>
             </ul>
         </div>
         <a routerLink="/home" class="btn btn-ghost text-xl">Tour Planner</a>
     </div>
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
-            <li><a routerLink="">Tab 1</a></li>
-            <li><a routerLink="">Tab 2</a></li>
+            <li [hidden]="!isLogged()"><a routerLink="/tours">
+                <button class="btn btn-outline">
+                    Your Tours
+                </button>
+            </a></li>
+            <li [hidden]="!isLogged()"><input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" /></li>
         </ul>
     </div>
     <div class="navbar-end">
-        <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
         <app-theme></app-theme>
-        <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full">
-                    <ng-icon name="featherSettings" size="32"></ng-icon>
-                </div>
-            </div>
-            <ul
-                    tabindex="0"
-                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                <li [hidden]="isLogged()"><a routerLink="/register">Login / Register</a></li>
-                <li [hidden]="!isLogged()">
-                    <a class="justify-between" routerLink="/profile">
-                        Profile
-                        <span class="badge">New</span>
-                    </a>
-                </li>
-                <li [hidden]="!isLogged()"><a routerLink="/settings">Settings</a></li>
-                <li [hidden]="!isLogged()" (click)="logout()"><a>Logout</a></li>
-            </ul>
-        </div>
+        <button [hidden]="isLogged()" class="btn btn-outline" routerLink="/login">Login / Register</button>
+        <button [hidden]="!isLogged()" class="btn btn-outline" routerLink="/profile">Profile</button>
+        <button [hidden]="!isLogged()" class="btn btn-outline btn-error" (click)="logout()">Logout</button>
     </div>
 </div>
