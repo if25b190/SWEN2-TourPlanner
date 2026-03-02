@@ -1,5 +1,6 @@
 package at.fhtw.tourplanner.dto;
 
+import at.fhtw.tourplanner.model.Account;
 import at.fhtw.tourplanner.model.Tour;
 import at.fhtw.tourplanner.model.TransportType;
 import lombok.Builder;
@@ -20,9 +21,9 @@ public record TourDto(
         @NonNull TransportType transportType,
         @NonNull Float distance,
         @NonNull Time estimatedTime,
-        @NonNull String creator
+        String creator
 ) {
-    public static Tour toEntity(TourDto tourDto) {
+    public static Tour toEntity(TourDto tourDto, Account account) {
         return Tour.builder()
                 .uuid(Optional.ofNullable(tourDto.uuid).map(UUID::fromString).orElse(null))
                 .name(tourDto.name())
@@ -32,7 +33,7 @@ public record TourDto(
                 .transportType(tourDto.transportType)
                 .distance(tourDto.distance)
                 .estimatedTime(tourDto.estimatedTime)
-                .creator(tourDto.creator)
+                .creator(account)
                 .build();
     }
 
@@ -46,7 +47,7 @@ public record TourDto(
                 tour.getTransportType(),
                 tour.getDistance(),
                 tour.getEstimatedTime(),
-                tour.getCreator()
+                tour.getCreator().getUsername()
         );
     }
 }

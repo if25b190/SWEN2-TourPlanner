@@ -46,7 +46,8 @@ public class Tour extends GlobalEntity implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TourLog> logs;
     @NonNull
-    private String creator;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Account creator;
 
     @Data
     @NoArgsConstructor

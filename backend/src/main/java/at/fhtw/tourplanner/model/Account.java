@@ -1,8 +1,6 @@
 package at.fhtw.tourplanner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -37,6 +35,8 @@ public class Account extends GlobalEntity implements UserDetails {
     @NotNull
     @Builder.Default
     private boolean enabled = true;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tour> tours;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

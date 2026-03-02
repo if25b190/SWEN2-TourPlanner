@@ -1,6 +1,8 @@
 package at.fhtw.tourplanner.service;
 
 import at.fhtw.tourplanner.dto.TourDto;
+import at.fhtw.tourplanner.dto.TourUpdateDto;
+import at.fhtw.tourplanner.model.Account;
 import at.fhtw.tourplanner.repository.TourRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,33 +23,33 @@ import java.util.stream.Collectors;
 public class TourService {
     private final TourRepository tourRepository;
 
-    //TODO user check
-    public Optional<ArrayList<TourDto>> getAllToursOfUser(String username) {
-        return tourRepository.getAllToursByCreator(username)
+    public Optional<ArrayList<TourDto>> getAllToursOfUser(Account account) {
+        return tourRepository.getAllToursByCreator(account.getUsername())
                 .map(tours -> (ArrayList<TourDto>) tours.stream()
                         .map(TourDto::fromEntity)
                         .collect(Collectors.toList()));
     }
 
-    //TODO user check
-    public Optional<TourDto> getTourByUuid(UUID uuid) {
+    public Optional<TourDto> getTourByUuid(UUID uuid, Account account) {
         return tourRepository.getTourByUuid(uuid)
+                .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
                 .map(TourDto::fromEntity);
     }
 
-    public Optional<TourDto> addTour(TourDto tourDto) {
+    public Optional<TourDto> addTour(TourDto tourDto, Account account) {
         return Optional.ofNullable(tourDto)
-                .map(_ -> TourDto.toEntity(tourDto))
+                .map(_ -> TourDto.toEntity(tourDto, account))
                 .map(tourRepository::save)
                 .map(TourDto::fromEntity);
     }
 
     //TODO user check
-    public Optional<TourDto> updateTour(TourDto tourDto) {
+    public Optional<TourDto> updateTour(TourUpdateDto tourDto, Account account) {
         return Optional.ofNullable(tourDto)
                 .map(_ -> tourRepository.getTourByUuid(UUID.fromString(tourDto.uuid())))
                 .filter(Optional::isPresent)
-                .map(_ -> TourDto.toEntity(tourDto))
+                .map(Optional::get)
+                .map(tour -> TourUpdateDto.merge(tour, tourDto))
                 .map(tourRepository::save)
                 .map(TourDto::fromEntity);
     }
