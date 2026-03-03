@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpResponse } from "@angular/common/http";
-import { Router } from "@angular/router";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
+import {Router} from "@angular/router";
 
 @Injectable({
     providedIn: 'root'
@@ -28,7 +28,12 @@ export class AuthService {
     }
 
     login(username: String, password: String, isRemember: boolean, callback: (res: HttpResponse<String>) => void) {
-        const formData = new HttpParams().set('username', username as string).set('password', password as string);
+        let formData = new HttpParams()
+            .set('username', username as string)
+            .set('password', password as string);
+        if (isRemember) {
+            formData = formData.set('remember-me', 'on');
+        }
         this.http.post('http://localhost:8080/api/v1/login', formData.toString(), {
             observe: 'response',
             responseType: 'text',
@@ -109,9 +114,4 @@ export class AuthService {
     isLoggedIn(): boolean {
         return sessionStorage.getItem("isLoggedIn") === "true" || localStorage.getItem("isLoggedIn") === "true";
     }
-
-    getCurrentEmail(): string | null {
-        return sessionStorage.getItem("currentEmail") || localStorage.getItem("currentEmail");
-    }
-
 }
