@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,11 +25,11 @@ public class TourController {
     private final TourService tourService;
 
     @GetMapping("")
-    public ResponseEntity<ArrayList<TourDto>> getAllTours(Authentication authentication) {
+    public ResponseEntity<List<TourDto>> getAllTours(Authentication authentication) {
         var account = PrincipalCheckUtil.getPrincipal(authentication);
         var result = tourService.getAllToursOfUser(account);
 
-        return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{uuid}")
@@ -47,7 +48,6 @@ public class TourController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
-    //TODO
     @PutMapping("")
     public ResponseEntity<TourDto> updateTour(@Valid @RequestBody TourUpdateDto tourUpdateDto, Authentication authentication) {
         var account = PrincipalCheckUtil.getPrincipal(authentication);
@@ -56,15 +56,14 @@ public class TourController {
                 .orElse(ResponseEntity.badRequest().build());
     }
 
-    //TODO
     @DeleteMapping("/{uuid}")
     public ResponseEntity<String> deleteTour(@PathVariable String uuid, Authentication authentication) {
         var account = PrincipalCheckUtil.getPrincipal(authentication);
-        var result = tourService.deleteTour(UUID.fromString(uuid));
-        if(result > 0) {
-            return ResponseEntity.ok("Tour deleted");
+        var result = tourService.deleteTour(UUID.fromString(uuid), account);
+        if (result.isPresent()) {
+            return ResponseEntity.ok(null);
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 }

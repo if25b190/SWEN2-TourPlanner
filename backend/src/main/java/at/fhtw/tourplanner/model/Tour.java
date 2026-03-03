@@ -1,13 +1,15 @@
 package at.fhtw.tourplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 
-import java.io.Serializable;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -15,7 +17,7 @@ import java.util.List;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class Tour extends GlobalEntity implements Serializable {
+public class Tour extends GlobalEntity {
     @Length(min = 4)
     @NonNull
     private String name;
@@ -43,10 +45,12 @@ public class Tour extends GlobalEntity implements Serializable {
     private Float distance;
     @NonNull
     private Time estimatedTime;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TourLog> logs;
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "tour")
+    @ToString.Exclude
+    @JsonIgnore
+    @Builder.Default
+    private List<TourLog> logs = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     private Account creator;
 
     @Data

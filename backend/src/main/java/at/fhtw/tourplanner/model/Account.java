@@ -1,5 +1,6 @@
 package at.fhtw.tourplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -9,7 +10,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -17,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 public class Account extends GlobalEntity implements UserDetails {
     @NotNull
     @Length(min = 4)
@@ -35,8 +38,24 @@ public class Account extends GlobalEntity implements UserDetails {
     @NotNull
     @Builder.Default
     private boolean enabled = true;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Tour> tours;
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "creator")
+    @ToString.Exclude
+    @JsonIgnore
+    @Builder.Default
+    private List<Tour> tours = new ArrayList<>();
+
+    public List<Tour> getTours() {
+        return Collections.unmodifiableList(tours);
+    }
+
+    public Tour addTour(Tour tour) {
+        if (tour == null || tours.contains(tour)) {
+            return null;
+        }
+        tour.setCreator(this);
+        tours.add(tour);
+        return tour;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

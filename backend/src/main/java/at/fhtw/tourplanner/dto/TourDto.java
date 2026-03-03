@@ -23,7 +23,7 @@ public record TourDto(
         @NonNull Time estimatedTime,
         String creator
 ) {
-    public static Tour toEntity(TourDto tourDto, Account account) {
+    public static Tour toEntity(TourDto tourDto) {
         return Tour.builder()
                 .uuid(Optional.ofNullable(tourDto.uuid).map(UUID::fromString).orElse(null))
                 .name(tourDto.name())
@@ -33,7 +33,6 @@ public record TourDto(
                 .transportType(tourDto.transportType)
                 .distance(tourDto.distance)
                 .estimatedTime(tourDto.estimatedTime)
-                .creator(account)
                 .build();
     }
 
