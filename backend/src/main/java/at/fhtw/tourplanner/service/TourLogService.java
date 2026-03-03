@@ -50,7 +50,7 @@ public class TourLogService {
 
     public Optional<TourLogDto> updateTourLog(TourLogUpdateDto tourLogUpdateDto, Account account) {
         return Optional.ofNullable(tourLogUpdateDto)
-                .map(_ -> tourLogRepository.getTourLogByUuid(UUID.fromString(tourLogUpdateDto.tour())))
+                .map(_ -> tourLogRepository.getTourLogByUuid(UUID.fromString(tourLogUpdateDto.uuid())))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .filter(log -> log.getCreator().getUuid().equals(account.getUuid()))
