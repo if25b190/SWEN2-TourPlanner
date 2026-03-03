@@ -47,15 +47,6 @@ public class TourService {
                 .map(user -> user.addTour(TourDto.toEntity(tourDto)))
                 .map(tourRepository::save)
                 .map(TourDto::fromEntity);
-
-
-
-//
-//        return Optional.ofNullable(tourDto)
-//                .map(_ -> TourDto.toEntity(tourDto))
-//                .map(account::addTour)
-//                .map(tourRepository::save)
-//                .map(TourDto::fromEntity);
     }
 
     public Optional<TourDto> updateTour(TourUpdateDto tourDto, Account account) {

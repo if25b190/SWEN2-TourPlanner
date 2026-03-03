@@ -16,11 +16,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @ToString
 public class TourLog extends GlobalEntity {
-    @NonNull
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     private Account creator;
-    @NonNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.REFRESH, optional = false, fetch = FetchType.LAZY)
     private Tour tour;
     @NonNull
     private LocalDateTime creationDate;

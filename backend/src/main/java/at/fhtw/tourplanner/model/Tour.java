@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +53,19 @@ public class Tour extends GlobalEntity {
     private List<TourLog> logs = new ArrayList<>();
     @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     private Account creator;
+
+    public List<TourLog> getLogs() {return Collections.unmodifiableList(logs);}
+
+    public TourLog addLog(TourLog log) {
+        if(log == null || logs.contains(log)) {
+            return null;
+        }
+
+        log.setTour(this);
+        log.setCreator(this.creator);
+        logs.add(log);
+        return log;
+    }
 
     @Data
     @NoArgsConstructor
