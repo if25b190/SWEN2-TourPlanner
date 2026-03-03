@@ -1,8 +1,6 @@
 package at.fhtw.tourplanner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -19,9 +17,11 @@ import java.time.LocalDateTime;
 @ToString
 public class TourLog extends GlobalEntity {
     @NonNull
-    private String creator;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    private Account creator;
     @NonNull
-    private Integer tourId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Tour tour;
     @NonNull
     private LocalDateTime creationDate;
     @NonNull
