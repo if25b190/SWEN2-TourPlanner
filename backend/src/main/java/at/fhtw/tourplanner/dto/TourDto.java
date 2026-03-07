@@ -1,6 +1,5 @@
 package at.fhtw.tourplanner.dto;
 
-import at.fhtw.tourplanner.model.Account;
 import at.fhtw.tourplanner.model.Tour;
 import at.fhtw.tourplanner.model.TransportType;
 import lombok.Builder;
