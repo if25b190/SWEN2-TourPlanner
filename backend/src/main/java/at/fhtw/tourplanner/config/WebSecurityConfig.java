@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -63,6 +64,8 @@ public class WebSecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(conf -> conf
+                        .requestMatchers(HttpMethod.OPTIONS)
+                        .permitAll()
                         .requestMatchers("/h2-console/**")
                         .hasRole("ADMIN")
                         .requestMatchers(
@@ -89,7 +92,6 @@ public class WebSecurityConfig {
                 )
                 .logout(conf -> conf
                         .logoutUrl("/api/v1/logout")
-                        .permitAll()
                         .logoutSuccessHandler((req, res, auth) -> {
                             res.setStatus(200);
                             handleCors(req, res);

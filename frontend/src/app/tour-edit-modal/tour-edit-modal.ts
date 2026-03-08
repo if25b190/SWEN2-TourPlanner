@@ -1,19 +1,19 @@
 import {Component, ElementRef, EventEmitter, Input, model, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {FormsModule} from "@angular/forms";
-import {TourService} from "../../service/tour";
 import {Observable, Subscription} from "rxjs";
 import {MapLocation, TourModel} from "../../model/m_tour";
+import {TourService} from "../../service/tour";
 import {ToastrService} from "ngx-toastr";
+import {FormsModule} from "@angular/forms";
 
 @Component({
-  selector: 'app-tour-modal',
-    imports: [
-        FormsModule
-    ],
-  templateUrl: './tour-modal.html',
-  styleUrl: './tour-modal.scss',
+  selector: 'app-tour-edit-modal',
+  imports: [
+    FormsModule
+  ],
+  templateUrl: './tour-edit-modal.html',
+  styleUrl: './tour-edit-modal.scss',
 })
-export class TourModal implements OnInit, OnDestroy {
+export class TourEditModal implements OnInit, OnDestroy {
   private selectMode?: "Start" | "Destination";
   private subscriptions: Subscription[] = [];
   readonly transportTypes = ["Bicycle", "Running", "Hiking"];
@@ -22,7 +22,8 @@ export class TourModal implements OnInit, OnDestroy {
   start = model<MapLocation>();
   destination = model<MapLocation>();
   transportType = model<number>(0);
-  @ViewChild("addTourModal") addTourModalRef: ElementRef<HTMLDialogElement> | undefined;
+  @ViewChild("editTourModal") editTourModalRef: ElementRef<HTMLDialogElement> | undefined;
+  @Input() tourData?: TourModel;
   @Input() selectedLocation?: Observable<MapLocation>;
   @Output() selectingEvent = new EventEmitter<void>();
 
@@ -39,10 +40,13 @@ export class TourModal implements OnInit, OnDestroy {
           this.destination.set(mapLocation);
           break;
       }
-      this.addTourModalRef?.nativeElement.showModal();
+      this.editTourModalRef?.nativeElement.showModal();
     });
     if (selectedLocationSub) {
       this.subscriptions.push(selectedLocationSub);
+    }
+    if (this.tourData) {
+      this.setTourForm(this.tourData);
     }
   }
 
@@ -53,13 +57,13 @@ export class TourModal implements OnInit, OnDestroy {
   selectStart(): void {
     this.selectMode = "Start";
     this.selectingEvent.emit();
-    this.addTourModalRef?.nativeElement.close();
+    this.editTourModalRef?.nativeElement.close();
   }
 
   selectDestination(): void {
     this.selectMode = 'Destination';
     this.selectingEvent.emit();
-    this.addTourModalRef?.nativeElement.close();
+    this.editTourModalRef?.nativeElement.close();
   }
 
   isTourNameValid(): boolean {
@@ -74,20 +78,30 @@ export class TourModal implements OnInit, OnDestroy {
     return this.isTourNameValid() && this.isDescriptionValid();
   }
 
-  createTour(): void {
+  editTour(): void {
     const tourModel: TourModel = {
+      uuid: this.tourData?.uuid,
       name: this.tourName(),
       description: this.description(),
       from: this.start(),
       to: this.destination(),
       transportType: this.transportTypes[this.transportType()]
     }
-    this.tourService.createTour(tourModel, (tour) => {
+    this.tourService.updateTour(tourModel, (tour) => {
       console.log(tour);
-      this.toastr.success("Tour added!");
+      this.toastr.success("Tour updated!");
       this.clearTourForm();
-      this.addTourModalRef?.nativeElement.close();
+      this.editTourModalRef?.nativeElement.close();
     });
+  }
+
+  setTourForm(tour: TourModel): void {
+    this.tourName.set(tour.name ?? "");
+    this.description.set(tour.description ?? "");
+    this.start.set(tour.from);
+    this.destination.set(tour.to);
+    const transportType = this.transportTypes.indexOf(tour.transportType ?? "");
+    this.transportType.set(transportType != -1 ? transportType : 0);
   }
 
   clearTourForm(): void {

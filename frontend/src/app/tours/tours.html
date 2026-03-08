@@ -2,20 +2,43 @@
     <!-- LEFT -->
     <div class="col-span-1 row-span-2 bg-base-100 rounded-box shadow p-4">
         <h2 class="text-lg font-bold mb-4">Your Tours</h2>
-        <app-tour-modal [selectedLocation]="selectedLocation"></app-tour-modal>
-        <button
-                class="btn btn-primary w-full mb-4"
-                (click)="startLocationSelection()"
-        >
-            Select Location On Map
-        </button>
+        <app-tour-modal
+                [selectedLocation]="selectedLocation.asObservable()"
+                (selectingEvent)="startLocationSelection()">
+        </app-tour-modal>
 
-        @if (selectedLocation) {
-            <div class="text-sm">
-                <p><b>Latitude:</b> {{ selectedLocation.latitude }}</p>
-                <p><b>Longitude:</b> {{ selectedLocation.longitude }}</p>
-            </div>
-        }
+        <ul class="list bg-base-100 rounded-box shadow-md">
+            <li class="p-4 pb-2 text-md opacity-60 tracking-wide">{{tourData.length}} Tours</li>
+            @for (tour of tourData; track tour.uuid) {
+                <li class="list-row">
+                    <div><img class="size-10 rounded-box" src="https://picsum.photos/536/354"/></div>
+                    <div>
+                        <div>{{tour.name}}</div>
+                        <div class="text-xs uppercase font-semibold opacity-60">{{tour.description}}</div>
+                        <div class="text-xs uppercase font-semibold opacity-60">15 Tour Logs</div>
+                    </div>
+                    <div class="tooltip">
+                        <div class="tooltip-content">
+                            <div class="animate-bounce text-orange-400 text-xl font-black">Export</div>
+                        </div>
+                        <button class="btn btn-square btn-ghost">
+                            <svg class="size-[1.4em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="currentColor" stroke="currentColor">
+                                    <path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                    <app-tour-edit-modal
+                            [tourData]="tour"
+                            [selectedLocation]="selectedLocation.asObservable()"
+                            (selectingEvent)="startLocationSelection()">
+                    </app-tour-edit-modal>
+                    <app-tour-delete-modal [tourData]="tour">
+                    </app-tour-delete-modal>
+                </li>
+            }
+        </ul>
     </div>
 
     <!-- TOP RIGHT (MAP) -->
