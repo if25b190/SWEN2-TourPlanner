@@ -1,0 +1,94 @@
+<div class="tooltip">
+    <div class="tooltip-content">
+        <div class="animate-bounce text-orange-400 text-xl font-black">Edit</div>
+    </div>
+    <button class="btn btn-square btn-ghost" (click)="editTourModal.showModal()">
+        <svg class="size-[1.4em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+            <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="currentColor"
+               stroke="currentColor">
+                <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/>
+            </g>
+        </svg>
+    </button>
+</div>
+<dialog #editTourModal class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold mb-5">Edit Tour</h3>
+        <div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Tour Name</legend>
+                <label class="input">
+                    <input type="text" placeholder="Tour Name" [(ngModel)]="tourName" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isTourNameValid()) ? 'none' : 'block'">Enter
+                valid tour name
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Description</legend>
+                <label class="input">
+                    <input type="text" placeholder="Description" [(ngModel)]="description" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isDescriptionValid()) ? 'none' : 'block'">
+                Enter
+                valid description
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Start</legend>
+                <div class="flex flex-row my-2">
+                    <label class="basis-128 input">
+                        <input type="text" placeholder="Start" [value]="start() | mapLocation" [disabled]="true" required/>
+                    </label>
+                    <div class="basis-16"></div>
+                    <button
+                            class="basis-32 btn btn-primary"
+                            (click)="selectStart()"
+                    >
+                        Select from map
+                    </button>
+                </div>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isStartValid()) ? 'none' : 'block'">
+                Enter
+                valid start
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Destination</legend>
+                <div class="flex flex-row my-2">
+                    <label class="basis-128 input">
+                        <input type="text" placeholder="Destination" [value]="destination() | mapLocation" [disabled]="true" required/>
+                    </label>
+                    <div class="basis-16"></div>
+                    <button
+                            class="basis-32 btn btn-primary"
+                            (click)="selectDestination()"
+                    >
+                        Select from map
+                    </button>
+                </div>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isDestinationValid()) ? 'none' : 'block'">
+                Enter
+                valid destination
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Transport Type</legend>
+                <select class="select" [(ngModel)]="transportType">
+                    @for (transportType of transportTypes; let idx = $index; track idx) {
+                        <option [value]="idx">{{ transportType }}</option>
+                    }
+                </select>
+            </fieldset>
+            <button class="btn btn-neutral" [disabled]="!isFormValid()" (click)="editTour()">Edit tour</button>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">Close</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>Close</button>
+    </form>
+</dialog>

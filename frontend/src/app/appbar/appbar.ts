@@ -9,7 +9,6 @@ import {AuthService} from "../../service/auth";
     imports: [
         RouterLink,
         Theme,
-        NgIcon
     ],
   templateUrl: './appbar.html',
   styleUrl: './appbar.scss'
