@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {TourModel} from "../../model/m_tour";
 import {TourService} from "../../service/tour";
@@ -16,6 +16,7 @@ import {ToastrService} from "ngx-toastr";
 export class TourDeleteModal {
   @ViewChild("deleteTourModal") deleteTourModal: ElementRef<HTMLDialogElement> | undefined;
   @Input() tourData?: TourModel;
+  @Output() refreshData = new EventEmitter<void>();
 
   constructor(private tourService: TourService, private toastr: ToastrService) {
   }
@@ -28,6 +29,7 @@ export class TourDeleteModal {
     this.tourService.deleteTour(this.tourData.uuid, () => {
       this.toastr.success("Tour deleted!");
       this.deleteTourModal?.nativeElement.close();
+      this.refreshData.emit();
     });
   }
 }

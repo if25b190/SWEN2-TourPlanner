@@ -7,6 +7,7 @@ import {Subject} from "rxjs";
 import {TourModel} from "../../model/m_tour";
 import {TourEditModal} from "../tour-edit-modal/tour-edit-modal";
 import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
+import {TourSearchButton} from "../tour-search-button/tour-search-button";
 
 @Component({
     selector: 'app-tours',
@@ -14,7 +15,8 @@ import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
         FormsModule,
         TourModal,
         TourEditModal,
-        TourDeleteModal
+        TourDeleteModal,
+        TourSearchButton
     ],
     templateUrl: './tours.html',
     styleUrl: './tours.scss',
@@ -27,14 +29,10 @@ export class Tours implements AfterViewInit {
     tourData: TourModel[] = [];
 
     constructor(private tourService: TourService) {
-        this.tourService.fetchAllTours(tours => {
-            console.log("TOUR DATA");
-            console.log(tours);
-            this.tourData = tours;
-        });
     }
 
     ngAfterViewInit(): void {
+        this.fetchAllTours();
         this.initMap();
     }
 
@@ -66,6 +64,14 @@ export class Tours implements AfterViewInit {
 
             this.selectingLocation = false;
             this.map.getContainer().style.cursor = '';
+        });
+    }
+
+    fetchAllTours(): void {
+        this.tourService.fetchAllTours(tours => {
+            console.log("TOUR DATA");
+            console.log(tours);
+            this.tourData = tours;
         });
     }
 

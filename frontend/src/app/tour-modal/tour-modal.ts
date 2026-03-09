@@ -4,12 +4,14 @@ import {TourService} from "../../service/tour";
 import {Observable, Subscription} from "rxjs";
 import {MapLocation, TourModel} from "../../model/m_tour";
 import {ToastrService} from "ngx-toastr";
+import {MapLocationPipe} from "../../pipe/map-location-pipe";
 
 @Component({
   selector: 'app-tour-modal',
-    imports: [
-        FormsModule
-    ],
+  imports: [
+    FormsModule,
+    MapLocationPipe
+  ],
   templateUrl: './tour-modal.html',
   styleUrl: './tour-modal.scss',
 })
@@ -25,12 +27,16 @@ export class TourModal implements OnInit, OnDestroy {
   @ViewChild("addTourModal") addTourModalRef: ElementRef<HTMLDialogElement> | undefined;
   @Input() selectedLocation?: Observable<MapLocation>;
   @Output() selectingEvent = new EventEmitter<void>();
+  @Output() refreshData = new EventEmitter<void>();
 
   constructor(private tourService: TourService, private toastr: ToastrService) {
   }
 
   ngOnInit(): void {
     const selectedLocationSub = this.selectedLocation?.subscribe((mapLocation) => {
+      if (!this.selectMode) {
+        return;
+      }
       switch (this.selectMode) {
         case "Start":
           this.start.set(mapLocation);
@@ -40,6 +46,7 @@ export class TourModal implements OnInit, OnDestroy {
           break;
       }
       this.addTourModalRef?.nativeElement.showModal();
+      this.selectMode = undefined;
     });
     if (selectedLocationSub) {
       this.subscriptions.push(selectedLocationSub);
@@ -70,8 +77,19 @@ export class TourModal implements OnInit, OnDestroy {
     return this.description().length >= 4;
   }
 
+  isStartValid(): boolean {
+    return this.start() != undefined;
+  }
+
+  isDestinationValid(): boolean {
+    return this.destination() != undefined;
+  }
+
   isFormValid(): boolean {
-    return this.isTourNameValid() && this.isDescriptionValid();
+    return this.isTourNameValid() &&
+        this.isDescriptionValid() &&
+        this.isStartValid() &&
+        this.isDestinationValid();
   }
 
   createTour(): void {
@@ -83,10 +101,10 @@ export class TourModal implements OnInit, OnDestroy {
       transportType: this.transportTypes[this.transportType()]
     }
     this.tourService.createTour(tourModel, (tour) => {
-      console.log(tour);
       this.toastr.success("Tour added!");
       this.clearTourForm();
       this.addTourModalRef?.nativeElement.close();
+      this.refreshData.emit();
     });
   }
 
