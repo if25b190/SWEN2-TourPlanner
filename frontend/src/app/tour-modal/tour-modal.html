@@ -1,0 +1,106 @@
+<button class="btn" (click)="addTourModal.showModal()">Add Tour</button>
+<dialog #addTourModal class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold mb-5">Add Tour</h3>
+        <div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Tour Name</legend>
+                <label class="input">
+                    <input type="text" placeholder="Tour Name" [(ngModel)]="tourName" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isTourNameValid()) ? 'none' : 'block'">Enter
+                valid tour name
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Description</legend>
+                <label class="input">
+                    <input type="text" placeholder="Description" [(ngModel)]="description" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isDescriptionValid()) ? 'none' : 'block'">
+                Enter
+                valid description
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Start</legend>
+                <div class="flex flex-row my-2">
+                    <label class="basis-128 input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                                    stroke-linejoin="round"
+                                    stroke-linecap="round"
+                                    stroke-width="2.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                            >
+                                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                            </g>
+                        </svg>
+                        <input type="text" placeholder="Start" [value]="start() | mapLocation" [disabled]="true" required/>
+                    </label>
+                    <div class="basis-16"></div>
+                    <button
+                            class="basis-32 btn btn-primary"
+                            (click)="selectStart()"
+                    >
+                        Select from map
+                    </button>
+                </div>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isStartValid()) ? 'none' : 'block'">
+                Enter
+                valid start
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Destination</legend>
+                <div class="flex flex-row my-2">
+                    <label class="basis-128 input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                                    stroke-linejoin="round"
+                                    stroke-linecap="round"
+                                    stroke-width="2.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                            >
+                                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                            </g>
+                        </svg>
+                        <input type="text" placeholder="Destination" [value]="destination() | mapLocation" [disabled]="true" required/>
+                    </label>
+                    <div class="basis-16"></div>
+                    <button
+                            class="basis-32 btn btn-primary"
+                            (click)="selectDestination()"
+                    >
+                        Select from map
+                    </button>
+                </div>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isDestinationValid()) ? 'none' : 'block'">
+                Enter
+                valid destination
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Transport Type</legend>
+                <select class="select" [(ngModel)]="transportType">
+                    @for (transportType of transportTypes; let idx = $index; track transportType) {
+                        <option [value]="idx">{{ transportType }}</option>
+                    }
+                </select>
+            </fieldset>
+            <button class="btn btn-neutral" [disabled]="!isFormValid()" (click)="createTour()">Add tour</button>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">Close</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>Close</button>
+    </form>
+</dialog>

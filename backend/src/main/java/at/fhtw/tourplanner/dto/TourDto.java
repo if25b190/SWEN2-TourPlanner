@@ -1,10 +1,9 @@
 package at.fhtw.tourplanner.dto;
 
-import at.fhtw.tourplanner.model.Account;
 import at.fhtw.tourplanner.model.Tour;
 import at.fhtw.tourplanner.model.TransportType;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 
 import java.sql.Time;
@@ -14,13 +13,13 @@ import java.util.UUID;
 @Builder
 public record TourDto(
         @org.hibernate.validator.constraints.UUID(allowEmpty = true) String uuid,
-        @NonNull @Length(min = 4) String name,
-        @NonNull @Length(min = 4) String description,
-        @NonNull Tour.MapPoint from,
-        @NonNull Tour.MapPoint to,
-        @NonNull TransportType transportType,
-        @NonNull Float distance,
-        @NonNull Time estimatedTime,
+        @NotNull @Length(min = 4) String name,
+        @NotNull @Length(min = 4) String description,
+        @NotNull Tour.MapPoint from,
+        @NotNull Tour.MapPoint to,
+        @NotNull TransportType transportType,
+        Float distance,
+        Time estimatedTime,
         String creator
 ) {
     public static Tour toEntity(TourDto tourDto) {

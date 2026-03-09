@@ -42,9 +42,7 @@ public class Tour extends GlobalEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     private TransportType transportType;
-    @NonNull
     private Float distance;
-    @NonNull
     private Time estimatedTime;
     @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "tour")
     @ToString.Exclude
