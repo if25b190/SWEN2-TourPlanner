@@ -9,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,15 @@ public class TourService {
         return tourRepository.getTourByUuid(uuid)
                 .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
                 .map(TourDto::fromEntity);
+    }
+
+    public Page<TourDto> searchTour(String searchTerm, Pageable pageable, Account account) {
+        return new PageImpl<>(
+                tourRepository.findAllWithSearch(searchTerm, pageable)
+                    .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
+                    .map(TourDto::fromEntity)
+                    .toList()
+        );
     }
 
     public Optional<TourDto> addTour(TourDto tourDto, Account account) {
