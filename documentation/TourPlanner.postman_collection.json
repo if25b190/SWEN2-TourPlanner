@@ -113,7 +113,20 @@
           "name": "Get Tours Of User",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours"
+              ]
+            }
           },
           "response": []
         },
@@ -121,31 +134,258 @@
           "name": "Get Tour By Uuid",
           "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours/dc0da731-b75f-49fa-b528-f3e2e1f89158",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours",
+                "dc0da731-b75f-49fa-b528-f3e2e1f89158"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Update Tour",
           "request": {
-            "method": "GET",
-            "header": []
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "    {\n        \"uuid\": \"dc0da731-b75f-49fa-b528-f3e2e1f89158\",\n        \"name\": \"Alpine Adventure updated\",\n        \"description\": \"A scenic hiking tour through the Swiss Alps.\",\n        \"from\": {\n            \"latitude\": 47.3769,\n            \"longitude\": 8.5417\n        },\n        \"to\": {\n            \"latitude\": 46.4826,\n            \"longitude\": 9.8355\n        },\n        \"transportType\": \"Hiking\",\n        \"distance\": 12.5,\n        \"estimatedTime\": \"04:30:00\",\n        \"creator\": \"user1\"\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Delete Tour",
           "request": {
-            "method": "GET",
-            "header": []
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours/dc0da731-b75f-49fa-b528-f3e2e1f89158",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours",
+                "dc0da731-b75f-49fa-b528-f3e2e1f89158"
+              ]
+            }
           },
           "response": []
         },
         {
           "name": "Create Tour",
           "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alpine Adventure\",\n  \"description\": \"A scenic hiking tour through the Swiss Alps.\",\n  \"from\": {\n    \"longitude\": 8.5417,\n    \"latitude\": 47.3769\n  },\n  \"to\": {\n    \"longitude\": 9.8355,\n    \"latitude\": 46.4826\n  },\n  \"transportType\": \"Hiking\",\n  \"distance\": 12.5,\n  \"estimatedTime\": \"04:30:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tour Log",
+      "item": [
+        {
+          "name": "Get All Logs of Tour",
+          "request": {
             "method": "GET",
-            "header": []
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours/b9c53f35-5fa0-4faa-9ec5-96ecc7029449/logs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours",
+                "b9c53f35-5fa0-4faa-9ec5-96ecc7029449",
+                "logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tour Log",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/logs/1f2f49ab-a28e-44f2-879d-d4b6b8de296a",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "logs",
+                "1f2f49ab-a28e-44f2-879d-d4b6b8de296a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tour Log",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tour\": \"b9c53f35-5fa0-4faa-9ec5-96ecc7029449\",\n  \"creationDate\": \"2026-03-03T15:45:00\",\n  \"comment\": \"The view from the summit was incredible, though the descent was a bit slippery.\",\n  \"difficulty\": \"Hell\",\n  \"distance\": 12.5,\n  \"totalTime\": \"04:30:00\",\n  \"rating\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/logs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tour Log",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"fd4ad3b9-b425-42c6-a25e-82c5ae47615f\",\n  \"tour\": \"b9c53f35-5fa0-4faa-9ec5-96ecc7029449\",\n  \"creationDate\": \"2026-03-03T15:45:00\",\n  \"comment\": \"The view from the summit was incredible, though the descent was a bit slippery. updated\",\n  \"difficulty\": \"Intermediate\",\n  \"distance\": 12.5,\n  \"totalTime\": \"04:30:00\",\n  \"rating\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/logs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "logs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tour Log",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/logs/1f2f49ab-a28e-44f2-879d-d4b6b8de296a",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "logs",
+                "1f2f49ab-a28e-44f2-879d-d4b6b8de296a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Tour",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours/search/Patrick&page=0&size=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours",
+                "search",
+                "Patrick&page=0&size=1"
+              ]
+            }
           },
           "response": []
         }
