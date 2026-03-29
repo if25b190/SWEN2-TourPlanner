@@ -9,6 +9,7 @@ import lombok.NonNull;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Builder
@@ -20,7 +21,7 @@ public record TourLogUpdateDto (
         String comment,
         String difficulty,
         Float distance,
-        Time totalTime,
+        LocalTime totalTime,
         Integer rating
 ) {
     public static TourLog merge(TourLog tourLog, TourLogUpdateDto tourLogUpdateDto) {

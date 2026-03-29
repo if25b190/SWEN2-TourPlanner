@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, model} from '@angular/core';
 import {TourService} from "../../service/tour";
 import {FormsModule} from "@angular/forms";
 import * as leaflet from "leaflet";
@@ -8,6 +8,8 @@ import {TourModel} from "../../model/m_tour";
 import {TourEditModal} from "../tour-edit-modal/tour-edit-modal";
 import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
 import {TourSearchButton} from "../tour-search-button/tour-search-button";
+import {TourLogs} from "../tour-logs/tour-logs";
+import {TourLogsAddModal} from "../tour-logs-add-modal/tour-logs-add-modal";
 
 @Component({
     selector: 'app-tours',
@@ -16,7 +18,9 @@ import {TourSearchButton} from "../tour-search-button/tour-search-button";
         TourModal,
         TourEditModal,
         TourDeleteModal,
-        TourSearchButton
+        TourSearchButton,
+        TourLogs,
+        TourLogsAddModal
     ],
     templateUrl: './tours.html',
     styleUrl: './tours.scss',
@@ -24,6 +28,9 @@ import {TourSearchButton} from "../tour-search-button/tour-search-button";
 export class Tours implements AfterViewInit {
     private map!: leaflet.Map;
     private marker?: leaflet.Marker;
+    private tourMarkers: leaflet.Marker[] = [];
+    private tourRouteLine?: leaflet.Polyline;
+    selectedTour = model<TourModel>();
     selectingLocation = false;
     selectedLocation: Subject<{ latitude: number, longitude: number }> = new Subject();
     tourData: TourModel[] = [];
@@ -78,5 +85,69 @@ export class Tours implements AfterViewInit {
     startLocationSelection() {
         this.selectingLocation = true;
         this.map.getContainer().style.cursor = 'crosshair';
+    }
+
+    selectTour(tour: TourModel) {
+        if (this.selectedTour()?.uuid === tour.uuid) {
+            this.selectedTour.set(undefined);
+            this.clearTourMarkers();
+        } else {
+            this.selectedTour.set(undefined);
+            this.clearTourMarkers();
+            this.displayTourLocations(tour);
+            setTimeout(() => this.selectedTour.set(tour), 200);
+        }
+    }
+
+    private displayTourLocations(tour: TourModel): void {
+        const {from, to} = tour;
+        if (!from && !to) return;
+
+        const fromIcon = leaflet.divIcon({
+            className: '',
+            html: `<div style="background:#22c55e;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+        });
+        const toIcon = leaflet.divIcon({
+            className: '',
+            html: `<div style="background:#ef4444;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+        });
+
+        const points: leaflet.LatLngTuple[] = [];
+
+        if (from) {
+            const m = leaflet.marker([from.latitude, from.longitude], {icon: fromIcon})
+                .addTo(this.map)
+                .bindPopup(`<b>Start</b><br>${from.latitude.toFixed(5)}, ${from.longitude.toFixed(5)}`);
+            this.tourMarkers.push(m);
+            points.push([from.latitude, from.longitude]);
+        }
+
+        if (to) {
+            const m = leaflet.marker([to.latitude, to.longitude], {icon: toIcon})
+                .addTo(this.map)
+                .bindPopup(`<b>Destination</b><br>${to.latitude.toFixed(5)}, ${to.longitude.toFixed(5)}`);
+            this.tourMarkers.push(m);
+            points.push([to.latitude, to.longitude]);
+        }
+
+        if (points.length === 2) {
+            this.tourRouteLine = leaflet.polyline(points, {color: '#6366f1', weight: 3, dashArray: '6 6'})
+                .addTo(this.map);
+        }
+
+        this.map.fitBounds(leaflet.latLngBounds(points), {padding: [48, 48]});
+    }
+
+    private clearTourMarkers(): void {
+        this.tourMarkers.forEach(m => this.map.removeLayer(m));
+        this.tourMarkers = [];
+        if (this.tourRouteLine) {
+            this.map.removeLayer(this.tourRouteLine);
+            this.tourRouteLine = undefined;
+        }
     }
 }

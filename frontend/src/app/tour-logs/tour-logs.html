@@ -1,0 +1,59 @@
+<div class="bg-base-100 rounded-box shadow-md p-4">
+    <h2 class="text-lg font-bold mb-3">{{ tourLogs.length }} Tour Logs</h2>
+    <ul class="flex flex-col gap-2">
+        @for (tourLog of tourLogs; track tourLog.uuid) {
+            <li class="rounded-box shadow-sm border border-base-300 hover:bg-base-200 transition-colors p-3">
+
+                <!-- Top row: creator + date on left, actions on right -->
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                        <div class="font-semibold">{{ tourLog.creator }}</div>
+                        <div class="text-xs opacity-60">{{ tourLog.creationDate }}</div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0"
+                         (click)="$event.stopPropagation()">
+                        <app-tour-logs-edit-modal
+                                [tourLogData]="tourLog"
+                                (refreshData)="fetchAllTourLogs()">
+                        </app-tour-logs-edit-modal>
+                        <app-tour-logs-delete-modal
+                                [tourLogData]="tourLog"
+                                (refreshData)="fetchAllTourLogs()"
+                        ></app-tour-logs-delete-modal>
+                    </div>
+                </div>
+
+                <!-- Stats grid: 2 cols on mobile, 4 cols on desktop -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+                    <div class="bg-base-300 rounded-box p-2">
+                        <div class="text-xs uppercase font-semibold opacity-60 mb-0.5">Distance</div>
+                        <div class="font-medium">{{ tourLog.distance }} km</div>
+                    </div>
+                    <div class="bg-base-300 rounded-box p-2">
+                        <div class="text-xs uppercase font-semibold opacity-60 mb-0.5">Total Time</div>
+                        <div class="font-medium">{{ tourLog.totalTime }}</div>
+                    </div>
+                    <div class="bg-base-300 rounded-box p-2">
+                        <div class="text-xs uppercase font-semibold opacity-60 mb-0.5">Difficulty</div>
+                        <div class="font-medium">{{ tourLog.difficulty }}</div>
+                    </div>
+                    <div class="bg-base-300 rounded-box p-2">
+                        <div class="text-xs uppercase font-semibold opacity-60 mb-0.5">Rating</div>
+                        <div class="rating rating-sm pointer-events-none">
+                            @for (star of [1,2,3,4,5]; track star) {
+                                <input type="radio" class="mask mask-star-2 bg-orange-400"
+                                       [checked]="tourLog.rating === star" disabled/>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment (only if present) -->
+                @if (tourLog.comment) {
+                    <div class="mt-2 text-sm opacity-70 italic">{{ tourLog.comment }}</div>
+                }
+
+            </li>
+        }
+    </ul>
+</div>

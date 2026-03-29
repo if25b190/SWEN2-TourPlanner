@@ -1,0 +1,76 @@
+<button class="btn my-1" (click)="addTourLogModal.showModal()">Add Tour Log</button>
+<dialog #addTourLogModal class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold mb-5">Add Tour Log</h3>
+        <div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Date</legend>
+                <label class="input">
+                    <input type="datetime-local" placeholder="Date" [(ngModel)]="creationDate" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isCreationDateValid()) ? 'none' : 'block'">
+                Enter
+                valid date
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Total Time</legend>
+                <label class="input">
+                    <input type="time" placeholder="Total Time" [(ngModel)]="totalTime" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isTotalTimeValid()) ? 'none' : 'block'">
+                Enter
+                valid total time
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Comment</legend>
+                <label class="input">
+                    <input type="text" placeholder="Comment" [(ngModel)]="comment" required/>
+                </label>
+            </fieldset>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Distance</legend>
+                <label class="input">
+                    <input type="number" placeholder="Distance" [(ngModel)]="distance" required/>
+                </label>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isDistanceValid()) ? 'none' : 'block'">
+                Enter
+                valid distance
+            </div>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Difficulty</legend>
+                <select class="select" [(ngModel)]="difficulty">
+                    @for (difficulty of difficulties; let idx = $index; track difficulty) {
+                        <option [value]="idx">{{ difficulty }}</option>
+                    }
+                </select>
+            </fieldset>
+            <fieldset class="fieldset my-2">
+                <legend class="fieldset-legend">Rating</legend>
+                <div class="rating rating-lg">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <input type="radio"
+                               name="rating"
+                               class="mask mask-star-2 bg-orange-400"
+                               [checked]="rating() === star"
+                               (click)="rating.set(star)"/>
+                    }
+                </div>
+            </fieldset>
+            <div class="validator-hint mb-3 form-error" [style.display]="(isRatingValid()) ? 'none' : 'block'">
+                Select a rating
+            </div>
+            <button class="btn btn-neutral" [disabled]="!isFormValid()" (click)="createTourLog()">Add tour log</button>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">Close</button>
+            </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>Close</button>
+    </form>
+</dialog>
