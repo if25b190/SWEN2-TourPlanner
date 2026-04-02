@@ -2,7 +2,7 @@
     <div class="tooltip-content">
         <div class="animate-bounce text-orange-400 text-xl font-black">Edit</div>
     </div>
-    <button class="btn btn-square btn-ghost" (click)="editTourModal.showModal()">
+    <button class="btn btn-square btn-ghost" (click)="editTourModal.showModal(); $event.stopPropagation();">
         <svg class="size-[1.4em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
             <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="currentColor"
                stroke="currentColor">

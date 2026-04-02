@@ -1,58 +1,124 @@
 <div class="grid grid-cols-6 grid-rows-2 h-screen gap-4 p-4 bg-base-200">
-    <!-- LEFT -->
-    <div class="col-span-2 row-span-2 bg-base-100 rounded-box shadow p-4">
-        <h2 class="text-lg font-bold mb-4">Your Tours</h2>
-        <app-tour-search-button class="mx-1">
-        </app-tour-search-button>
-        <app-tour-modal class="mx-1"
-                [selectedLocation]="selectedLocation.asObservable()"
-                (selectingEvent)="startLocationSelection()"
-                (refreshData)="fetchAllTours()">
-        </app-tour-modal>
+    <div class="col-span-2 row-span-2 bg-base-100 rounded-box shadow flex flex-col overflow-hidden">
 
-        <ul class="list bg-base-100 rounded-box shadow-md">
-            <li class="p-4 pb-2 text-md opacity-60 tracking-wide">{{tourData.length}} Tours</li>
+        <div class="px-4 pt-4 pb-3 border-b border-base-300 shrink-0">
+            <h2 class="text-lg font-bold tracking-tight mb-3">Your Tours</h2>
+            <div class="flex gap-2">
+                <app-tour-search-button class="flex-1"></app-tour-search-button>
+                <app-tour-modal
+                        [selectedLocation]="selectedLocation.asObservable()"
+                        (selectingEvent)="startLocationSelection()"
+                        (refreshData)="fetchAllTours()">
+                </app-tour-modal>
+            </div>
+        </div>
+
+        <div class="px-4 py-2 text-xs font-semibold uppercase tracking-widest opacity-50 shrink-0">
+            {{ tourData.length }} Tours
+        </div>
+
+        <ul class="flex-1 overflow-y-auto px-3 pb-3 flex flex-col gap-2">
             @for (tour of tourData; track tour.uuid) {
-                <li class="list-row">
-                    <div><img class="size-10 rounded-box" src="https://picsum.photos/536/354"/></div>
-                    <div>
-                        <div>{{tour.name}}</div>
-                        <div class="text-xs uppercase font-semibold opacity-60">{{tour.description}}</div>
-                        <div class="text-xs uppercase font-semibold opacity-60">15 Tour Logs</div>
+                <li (click)="selectTour(tour)"
+                    [class]="'group relative rounded-xl cursor-pointer transition-all duration-200 overflow-hidden shadow-sm border ' +
+                             (selectedTour()?.uuid === tour.uuid
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : 'border-base-300 bg-base-100 hover:border-base-400 hover:shadow-md')">
+
+                    <div [class]="'absolute left-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 ' +
+                                  (selectedTour()?.uuid === tour.uuid ? 'bg-primary' : 'bg-transparent')">
                     </div>
-                    <div class="tooltip">
-                        <div class="tooltip-content">
-                            <div class="animate-bounce text-orange-400 text-xl font-black">Export</div>
+
+                    <div class="flex items-start gap-3 p-3 pl-4">
+                        <img class="size-12 rounded-lg object-cover shrink-0 shadow-sm mt-0.5"
+                             src="https://picsum.photos/536/354"/>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-sm truncate">{{ tour.name }}</div>
+                            <div class="text-xs opacity-50 truncate mt-0.5">{{ tour.description }}</div>
+
+                            @if (tour.from || tour.to) {
+                                <div class="flex items-center gap-1 mt-1 text-xs opacity-60">
+                                    <svg class="size-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                                    </svg>
+                                    <span class="truncate">
+                                        {{ tour.from ? tour.from.latitude.toFixed(3) + ', ' + tour.from.longitude.toFixed(3) : '—' }}
+                                    </span>
+                                    <svg class="size-3 shrink-0 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14m-7-7 7 7-7 7"/>
+                                    </svg>
+                                    <span class="truncate">
+                                        {{ tour.to ? tour.to.latitude.toFixed(3) + ', ' + tour.to.longitude.toFixed(3) : '—' }}
+                                    </span>
+                                </div>
+                            }
+
+                            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                @if (tour.distance) {
+                                    <span class="inline-flex items-center gap-1 text-xs opacity-60">
+                                        <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 12h18M3 6h18M3 18h18"/>
+                                        </svg>
+                                        {{ tour.distance }} km
+                                    </span>
+                                }
+                                @if (tour.estimatedTime) {
+                                    <span class="inline-flex items-center gap-1 text-xs opacity-60">
+                                        <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                                        </svg>
+                                        {{ tour.estimatedTime }}
+                                    </span>
+                                }
+                                @if (tour.transportType) {
+                                    <span class="badge badge-ghost badge-xs">{{ tour.transportType }}</span>
+                                }
+                            </div>
                         </div>
-                        <button class="btn btn-square btn-ghost">
-                            <svg class="size-[1.4em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-                                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="currentColor" stroke="currentColor">
-                                    <path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-                                </g>
-                            </svg>
-                        </button>
+
+                        <div class="flex flex-col items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                             (click)="$event.stopPropagation()">
+                            <div class="tooltip tooltip-left">
+                                <div class="tooltip-content">
+                                    <span class="text-orange-400 font-bold text-xs">Export</span>
+                                </div>
+                                <button class="btn btn-ghost btn-xs btn-square">
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                                        <path fill="currentColor" d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <app-tour-edit-modal
+                                    [tourData]="tour"
+                                    [selectedLocation]="selectedLocation.asObservable()"
+                                    (selectingEvent)="startLocationSelection()"
+                                    (refreshData)="fetchAllTours()">
+                            </app-tour-edit-modal>
+                            <app-tour-delete-modal
+                                    [tourData]="tour"
+                                    (refreshData)="fetchAllTours()">
+                            </app-tour-delete-modal>
+                        </div>
                     </div>
-                    <app-tour-edit-modal
-                            [tourData]="tour"
-                            [selectedLocation]="selectedLocation.asObservable()"
-                            (selectingEvent)="startLocationSelection()"
-                            (refreshData)="fetchAllTours()">
-                    </app-tour-edit-modal>
-                    <app-tour-delete-modal [tourData]="tour"
-                                           (refreshData)="fetchAllTours()">
-                    </app-tour-delete-modal>
                 </li>
             }
         </ul>
     </div>
 
-    <!-- TOP RIGHT (MAP) -->
     <div class="col-span-4 row-span-1 bg-base-100 rounded-box shadow p-2">
         <div id="map" class="w-full h-full rounded-box"></div>
     </div>
 
-    <!-- BOTTOM RIGHT -->
     <div class="col-span-4 row-span-1 bg-base-100 rounded-box shadow p-4">
-        <h2 class="text-lg font-bold mb-2">Tour Logs</h2>
+        @if (selectedTour()) {
+            <app-tour-logs-add-modal [tour]="selectedTour()">
+            </app-tour-logs-add-modal>
+            <app-tour-logs [tourUuid]="selectedTour()!.uuid!">
+            </app-tour-logs>
+        } @else {
+            <h2 class="text-lg font-bold mb-2">0 Tour Logs</h2>
+            <p>Select a tour to show its logs</p>
+        }
     </div>
 </div>

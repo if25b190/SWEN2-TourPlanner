@@ -9,6 +9,7 @@ import lombok.NonNull;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public record TourLogDto (
     @NonNull String comment,
     @NonNull String difficulty,
     @NonNull Float distance,
-    @NonNull Time totalTime,
+    @NonNull LocalTime totalTime,
     @NonNull @Min(0) @Max(4) Integer rating
 ) {
     public static TourLog toEntity(TourLogDto tourLogDto) {

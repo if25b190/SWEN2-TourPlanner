@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Data
@@ -30,7 +31,7 @@ public class TourLog extends GlobalEntity {
     @NonNull
     private Float distance;
     @NonNull
-    private Time totalTime;
+    private LocalTime totalTime;
     @NonNull
     @Min(0)
     @Max(4)
