@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +39,14 @@ public class TourLogController {
         var result = tourLogService.getTourLogByUuid(UUID.fromString(uuid), account);
 
         return result.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/logs/{uuid}/search/{searchTerm}")
+    public ResponseEntity<Page<TourLogDto>> getTourLog(@PathVariable String searchTerm, @PathVariable String uuid, Pageable pageable, Authentication authentication) {
+        var account = PrincipalCheckUtil.getPrincipal(authentication);
+        var result = tourLogService.searchTourLog(searchTerm, UUID.fromString(uuid), pageable, account);
+
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/logs")
