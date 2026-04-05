@@ -233,6 +233,29 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Search Tour",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/tours/search/Grand&page=0&size=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "tours",
+                "search",
+                "Grand&page=0&size=1"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -245,7 +268,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/tours/b9c53f35-5fa0-4faa-9ec5-96ecc7029449/logs",
+              "raw": "http://localhost:8080/api/v1/tours/fa351972-0eda-4f36-bc9e-53aa73762a9c/logs",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -255,7 +278,7 @@
                 "api",
                 "v1",
                 "tours",
-                "b9c53f35-5fa0-4faa-9ec5-96ecc7029449",
+                "fa351972-0eda-4f36-bc9e-53aa73762a9c",
                 "logs"
               ]
             }
@@ -268,7 +291,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/logs/1f2f49ab-a28e-44f2-879d-d4b6b8de296a",
+              "raw": "http://localhost:8080/api/v1/logs/fa351972-0eda-4f36-bc9e-53aa73762a9c",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -278,7 +301,7 @@
                 "api",
                 "v1",
                 "logs",
-                "1f2f49ab-a28e-44f2-879d-d4b6b8de296a"
+                "fa351972-0eda-4f36-bc9e-53aa73762a9c"
               ]
             }
           },
@@ -291,7 +314,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tour\": \"b9c53f35-5fa0-4faa-9ec5-96ecc7029449\",\n  \"creationDate\": \"2026-03-03T15:45:00\",\n  \"comment\": \"The view from the summit was incredible, though the descent was a bit slippery.\",\n  \"difficulty\": \"Hell\",\n  \"distance\": 12.5,\n  \"totalTime\": \"04:30:00\",\n  \"rating\": 4\n}",
+              "raw": "{\n  \"tour\": \"fa351972-0eda-4f36-bc9e-53aa73762a9c\",\n  \"creationDate\": \"2026-03-03T15:45:00\",\n  \"comment\": \"something else\",\n  \"difficulty\": \"Easy\",\n  \"distance\": 10,\n  \"totalTime\": \"04:30:00\",\n  \"rating\": 4\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -367,12 +390,12 @@
           "response": []
         },
         {
-          "name": "Search Tour",
+          "name": "Search Tour Log",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:8080/api/v1/tours/search/Patrick&page=0&size=1",
+              "raw": "http://localhost:8080/api/v1/logs/fa351972-0eda-4f36-bc9e-53aa73762a9c/search/slip&page=0&size=1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -381,9 +404,10 @@
               "path": [
                 "api",
                 "v1",
-                "tours",
+                "logs",
+                "fa351972-0eda-4f36-bc9e-53aa73762a9c",
                 "search",
-                "Patrick&page=0&size=1"
+                "slip&page=0&size=1"
               ]
             }
           },
