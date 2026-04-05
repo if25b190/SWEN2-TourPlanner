@@ -20,7 +20,9 @@ public record TourDto(
         @NotNull TransportType transportType,
         Float distance,
         Time estimatedTime,
-        String creator
+        String creator,
+        Integer popularity,
+        Integer childfriendliness
 ) {
     public static Tour toEntity(TourDto tourDto) {
         return Tour.builder()
@@ -45,7 +47,9 @@ public record TourDto(
                 tour.getTransportType(),
                 tour.getDistance(),
                 tour.getEstimatedTime(),
-                tour.getCreator().getUsername()
+                tour.getCreator().getUsername(),
+                tour.getPopularity(),
+                tour.getChildfriendliness()
         );
     }
 }
