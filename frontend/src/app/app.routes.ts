@@ -9,9 +9,8 @@ import {Tours} from "./tours/tours";
 export const routes: Routes = [
     { path: 'tours', component: Tours },
     { path: 'profile', component: Profile },
-    { path: 'home', component: Home },
     { path: 'register', component: Register },
     { path: 'login', component: Login },
     { path: 'terms', component: NotFound },
-    { path: '**', redirectTo: 'home', pathMatch: 'full' },
+    { path: '**', redirectTo: 'tours', pathMatch: 'full' },
 ];

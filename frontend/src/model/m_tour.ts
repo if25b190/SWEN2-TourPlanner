@@ -8,6 +8,8 @@ export interface TourModel {
     distance?: string,
     estimatedTime?: string,
     creator?: string,
+    popularity?: number,
+    childfriendliness?: number,
 }
 
 export interface MapLocation {
