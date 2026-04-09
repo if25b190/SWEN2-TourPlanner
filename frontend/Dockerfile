@@ -1,7 +1,7 @@
 # =========================================
 # Stage 1: Build the Angular Application
 # =========================================
-ARG NODE_VERSION=24.11.1-alpine
+ARG NODE_VERSION=24.14.1-alpine
 ARG NGINX_VERSION=alpine3.22
 
 # Use a lightweight Node.js image for building (customizable via ARG)
@@ -34,8 +34,9 @@ USER nginx
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy the static build output from the build stage to Nginx's default HTML serving directory
-COPY --chown=nginx:nginx --from=builder /app/dist/*/browser /usr/share/nginx/html
+# Copy the Angular browser bundle into nginx's document root.
+# Angular writes the browser assets to dist/browser for this project.
+COPY --chown=nginx:nginx --from=builder /app/dist/browser/ /usr/share/nginx/html/
 
 # Expose port 8080 to allow HTTP traffic
 # Note: The default NGINX container now listens on port 8080 instead of 80

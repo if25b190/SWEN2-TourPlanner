@@ -7,10 +7,10 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Data
@@ -51,6 +51,10 @@ public class Tour extends GlobalEntity {
     private List<TourLog> logs = new ArrayList<>();
     @ManyToOne(cascade = CascadeType.REFRESH, optional = false)
     private Account creator;
+    @Transient
+    private Integer popularity;
+    @Transient
+    private Integer childfriendliness;
 
     public List<TourLog> getLogs() {return Collections.unmodifiableList(logs);}
 
@@ -63,6 +67,17 @@ public class Tour extends GlobalEntity {
         log.setCreator(this.creator);
         logs.add(log);
         return log;
+    }
+
+    public Integer getPopularity() {
+        return this.logs.size();
+    }
+
+    public Integer getChildfriendliness() {
+        return this.logs.stream().filter(x -> x.getDifficulty().equals(Difficulty.Easy) &&
+                x.getDistance() <= 10 &&
+                x.getTotalTime().isBefore(LocalTime.of(5,0)))
+                .toList().size();
     }
 
     @Data

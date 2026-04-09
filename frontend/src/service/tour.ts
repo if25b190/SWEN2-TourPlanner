@@ -13,6 +13,23 @@ export class TourService {
   constructor(private http: HttpClient, private toastr: ToastrService) {
   }
 
+  searchTours(searchTerm: string, callback: (tours: TourModel[]) => void) {
+    this.http.get(`${this.baseApiUrl}/api/v1/tours/search/${searchTerm}?size=9999`, {
+      observe: 'response',
+      responseType: 'json',
+      withCredentials: true,
+    }).subscribe({
+      next: (res: HttpResponse<Object>) => {
+        const data = (res.body as any).content as TourModel[];
+        callback(data);
+      },
+      error: (err: HttpResponse<String>) => {
+        console.error(err);
+        this.toastr.error("Failed to fetch tours!");
+      }
+    });
+  }
+
   fetchAllTours(callback: (tours: TourModel[]) => void) {
     this.http.get(`${this.baseApiUrl}/api/v1/tours`, {
       observe: 'response',

@@ -7,7 +7,6 @@ import {Subject} from "rxjs";
 import {TourModel} from "../../model/m_tour";
 import {TourEditModal} from "../tour-edit-modal/tour-edit-modal";
 import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
-import {TourSearchButton} from "../tour-search-button/tour-search-button";
 import {TourLogs} from "../tour-logs/tour-logs";
 import {TourLogsAddModal} from "../tour-logs-add-modal/tour-logs-add-modal";
 
@@ -18,7 +17,6 @@ import {TourLogsAddModal} from "../tour-logs-add-modal/tour-logs-add-modal";
         TourModal,
         TourEditModal,
         TourDeleteModal,
-        TourSearchButton,
         TourLogs,
         TourLogsAddModal
     ],
@@ -71,6 +69,18 @@ export class Tours implements AfterViewInit {
 
             this.selectingLocation = false;
             this.map.getContainer().style.cursor = '';
+        });
+    }
+
+    searchTours(searchTerm: string): void {
+        if (searchTerm.length < 1) {
+            this.fetchAllTours();
+            return;
+        }
+        this.tourService.searchTours(searchTerm, tours => {
+            console.log("TOUR DATA");
+            console.log(tours);
+            this.tourData = tours;
         });
     }
 

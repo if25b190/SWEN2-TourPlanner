@@ -4,7 +4,21 @@
         <div class="px-4 pt-4 pb-3 border-b border-base-300 shrink-0">
             <h2 class="text-lg font-bold tracking-tight mb-3">Your Tours</h2>
             <div class="flex gap-2">
-                <app-tour-search-button class="flex-1"></app-tour-search-button>
+                <label class="input">
+                    <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g
+                                stroke-linejoin="round"
+                                stroke-linecap="round"
+                                stroke-width="2.5"
+                                fill="none"
+                                stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                    </svg>
+                    <input type="text" required placeholder="Search" (input.debounce.500)="searchTours($event.target.value)" />
+                </label>
                 <app-tour-modal
                         [selectedLocation]="selectedLocation.asObservable()"
                         (selectingEvent)="startLocationSelection()"
