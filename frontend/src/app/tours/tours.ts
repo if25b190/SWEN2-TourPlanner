@@ -9,6 +9,7 @@ import {TourEditModal} from "../tour-edit-modal/tour-edit-modal";
 import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
 import {TourLogs} from "../tour-logs/tour-logs";
 import {TourLogsAddModal} from "../tour-logs-add-modal/tour-logs-add-modal";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
     selector: 'app-tours',
@@ -32,8 +33,10 @@ export class Tours implements AfterViewInit {
     selectingLocation = false;
     selectedLocation: Subject<{ latitude: number, longitude: number }> = new Subject();
     tourData: TourModel[] = [];
+    private readonly uploadingTourUuids = new Set<string>();
+    private readonly tourImageVersions: Record<string, number> = {};
 
-    constructor(private tourService: TourService) {
+    constructor(private tourService: TourService, private toastr: ToastrService) {
     }
 
     ngAfterViewInit(): void {
@@ -90,6 +93,67 @@ export class Tours implements AfterViewInit {
             console.log(tours);
             this.tourData = tours;
         });
+    }
+
+    getTourImageUrl(tour: TourModel): string {
+        if (!tour.uuid) {
+            return this.getTourImageFallbackUrl(tour);
+        }
+
+        return this.tourService.getTourFileUrl(tour.uuid, this.tourImageVersions[tour.uuid] ?? 0);
+    }
+
+    getTourImageFallbackUrl(tour: TourModel): string {
+        return `https://picsum.photos/seed/${encodeURIComponent(tour.uuid ?? tour.name ?? 'tour')}/536/354`;
+    }
+
+    onTourImageError(event: Event, tour: TourModel): void {
+        const image = event.target as HTMLImageElement;
+        image.onerror = null;
+        image.src = this.getTourImageFallbackUrl(tour);
+    }
+
+    onTourFileSelected(tour: TourModel, event: Event): void {
+        event.stopPropagation();
+
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.item(0);
+        if (!file) {
+            return;
+        }
+
+        if (file.type && file.type !== "image/png") {
+            this.toastr.error("Upload a PNG image!");
+            input.value = "";
+            return;
+        }
+
+        if (!tour.uuid) {
+            this.toastr.error("Tour must be saved before uploading an image!");
+            input.value = "";
+            return;
+        }
+
+        if (this.uploadingTourUuids.has(tour.uuid)) {
+            input.value = "";
+            return;
+        }
+
+        this.uploadingTourUuids.add(tour.uuid);
+        const clearUploadState = () => {
+            this.uploadingTourUuids.delete(tour.uuid!);
+            input.value = "";
+        };
+
+        this.tourService.uploadTourFile(tour.uuid, file, () => {
+            this.toastr.success("Tour image uploaded!");
+            this.tourImageVersions[tour.uuid!] = Date.now();
+            clearUploadState();
+        }, clearUploadState);
+    }
+
+    isTourFileUploading(tour: TourModel): boolean {
+        return !!tour.uuid && this.uploadingTourUuids.has(tour.uuid);
     }
 
     startLocationSelection() {

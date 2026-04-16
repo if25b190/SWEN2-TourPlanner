@@ -96,4 +96,29 @@ export class TourService {
       }
     });
   }
+
+  getTourFileUrl(uuid: string, version = 0): string {
+    const url = `${this.baseApiUrl}/api/v1/files/${uuid}.png`;
+    return version > 0 ? `${url}?v=${version}` : url;
+  }
+
+  uploadTourFile(uuid: string, file: File, callback: () => void, errorCallback: () => void = () => {}) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post(`${this.baseApiUrl}/api/v1/files/${uuid}`, formData, {
+      observe: 'response',
+      responseType: 'text',
+      withCredentials: true,
+    }).subscribe({
+      next: () => {
+        callback();
+      },
+      error: (err: HttpResponse<String>) => {
+        console.error(err);
+        this.toastr.error("Failed to upload tour image!");
+        errorCallback();
+      }
+    });
+  }
 }
