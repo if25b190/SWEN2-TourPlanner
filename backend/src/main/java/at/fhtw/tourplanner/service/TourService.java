@@ -27,27 +27,38 @@ import java.util.UUID;
 public class TourService {
     private final UserRepository userRepository;
     private final TourRepository tourRepository;
+    private final OpenRouteService openRouteService;
 
     public List<TourDto> getAllToursOfUser(Account account) {
         return Optional.ofNullable(account)
                 .map(Account::getUuid)
                 .flatMap(userRepository::findByUuid)
                 .map(Account::getTours)
-                .map(tours -> tours.stream().map(TourDto::fromEntity).toList())
+                .map(tours -> tours.stream()
+                        .map(tour -> {
+                            openRouteService.setGeoInformationOfTour(tour);
+                            return TourDto.fromEntity(tour);
+                }).toList())
                 .orElse(Collections.emptyList());
     }
 
     public Optional<TourDto> getTourByUuid(UUID uuid, Account account) {
         return tourRepository.getTourByUuid(uuid)
                 .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
-                .map(TourDto::fromEntity);
+                .map(tour -> {
+                    openRouteService.setGeoInformationOfTour(tour);
+                    return TourDto.fromEntity(tour);
+                });
     }
 
     public Page<TourDto> searchTour(String searchTerm, Pageable pageable, Account account) {
         return new PageImpl<>(
                 tourRepository.findAllWithSearch(searchTerm, pageable)
                     .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
-                    .map(TourDto::fromEntity)
+                    .map(tour -> {
+                        openRouteService.setGeoInformationOfTour(tour);
+                        return TourDto.fromEntity(tour);
+                    })
                     .toList()
         );
     }
@@ -58,7 +69,10 @@ public class TourService {
                 .flatMap(userRepository::findByUuid)
                 .map(user -> user.addTour(TourDto.toEntity(tourDto)))
                 .map(tourRepository::save)
-                .map(TourDto::fromEntity);
+                .map(tour -> {
+                    openRouteService.setGeoInformationOfTour(tour);
+                    return TourDto.fromEntity(tour);
+                });
     }
 
     public Optional<TourDto> updateTour(TourUpdateDto tourDto, Account account) {
@@ -69,7 +83,10 @@ public class TourService {
                 .filter(tour -> tour.getCreator().getUuid().equals(account.getUuid()))
                 .map(tour -> TourUpdateDto.merge(tour, tourDto))
                 .map(tourRepository::save)
-                .map(TourDto::fromEntity);
+                .map(tour -> {
+                    openRouteService.setGeoInformationOfTour(tour);
+                    return TourDto.fromEntity(tour);
+                });
     }
 
     public Optional<Integer> deleteTour(UUID uuid, Account account) {

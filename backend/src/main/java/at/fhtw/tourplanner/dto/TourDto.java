@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
-import java.sql.Time;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,10 +20,11 @@ public record TourDto(
         @NotNull Tour.MapPoint to,
         @NotNull TransportType transportType,
         Float distance,
-        Time estimatedTime,
+        LocalTime estimatedTime,
         String creator,
         Integer popularity,
-        Integer childfriendliness
+        Integer childfriendliness,
+        List<Float[]> wayPoints
 ) {
     public static Tour toEntity(TourDto tourDto) {
         return Tour.builder()
@@ -32,12 +34,11 @@ public record TourDto(
                 .from(tourDto.from)
                 .to(tourDto.to)
                 .transportType(tourDto.transportType)
-                .distance(tourDto.distance)
-                .estimatedTime(tourDto.estimatedTime)
                 .build();
     }
 
     public static TourDto fromEntity(Tour tour) {
+
         return new TourDto(
                 Optional.ofNullable(tour.getUuid()).map(UUID::toString).orElse(null),
                 tour.getName(),
@@ -49,7 +50,8 @@ public record TourDto(
                 tour.getEstimatedTime(),
                 tour.getCreator().getUsername(),
                 tour.getPopularity(),
-                tour.getChildfriendliness()
+                tour.getChildfriendliness(),
+                tour.getWayPoints()
         );
     }
 }

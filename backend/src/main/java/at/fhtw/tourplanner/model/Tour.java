@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 
-import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,8 +41,10 @@ public class Tour extends GlobalEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     private TransportType transportType;
+    @Transient
     private Float distance;
-    private Time estimatedTime;
+    @Transient
+    private LocalTime estimatedTime;
     @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "tour")
     @ToString.Exclude
     @JsonIgnore
@@ -55,6 +56,8 @@ public class Tour extends GlobalEntity {
     private Integer popularity;
     @Transient
     private Integer childfriendliness;
+    @Transient
+    private List<Float[]> wayPoints;
 
     public List<TourLog> getLogs() {return Collections.unmodifiableList(logs);}
 
