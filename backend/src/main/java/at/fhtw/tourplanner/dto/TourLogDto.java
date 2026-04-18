@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.NonNull;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;

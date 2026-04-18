@@ -1,6 +1,7 @@
 package at.fhtw.tourplanner.controller;
 
 import at.fhtw.tourplanner.dto.TourDto;
+import at.fhtw.tourplanner.dto.TourExportDto;
 import at.fhtw.tourplanner.dto.TourUpdateDto;
 import at.fhtw.tourplanner.service.TourService;
 import at.fhtw.tourplanner.util.PrincipalCheckUtil;
@@ -8,12 +9,19 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -74,5 +82,27 @@ public class TourController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<Resource> exportTour (Authentication authentication) {
+        var account = PrincipalCheckUtil.getPrincipal(authentication);
+        List<TourExportDto> export = tourService.exportAllTourData(account);
+        ObjectMapper mapper = new ObjectMapper();
+        byte[] jsonData = mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(export);
+        Resource file = new ByteArrayResource(jsonData);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=tour_export.json")
+                .contentType(MediaType.APPLICATION_JSON)
+                .contentLength(jsonData.length)
+                .body(file);
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<String> importTour(@RequestParam("file") MultipartFile file, Authentication authentication) throws IOException {
+        var account = PrincipalCheckUtil.getPrincipal(authentication);
+        tourService.importTourData(file, account);
+        return ResponseEntity.ok(null);
     }
 }
