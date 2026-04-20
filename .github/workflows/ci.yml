@@ -29,4 +29,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Build with Maven
+        env:
+          OPENROUTE_KEY: ${{ secrets.OPENROUTE_API_KEY }}
         run: mvn --batch-mode clean test
