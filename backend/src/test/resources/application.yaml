@@ -22,3 +22,6 @@ server:
 tourplanner:
   domain: "https://nextgen.com"
   rememberMeKey: "key"
+openroute:
+  api:
+    key: ${OPENROUTE_KEY:test-openroute-key}
