@@ -5,11 +5,12 @@ export interface TourModel {
     from?: MapLocation,
     to?: MapLocation,
     transportType?: string,
-    distance?: string,
+    distance?: number,
     estimatedTime?: string,
     creator?: string,
     popularity?: number,
     childfriendliness?: number,
+    wayPoints?: number[][],
 }
 
 export interface MapLocation {

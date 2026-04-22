@@ -22,7 +22,7 @@ export class TourLogsAddModal {
     difficulty = model<number>(0);
     rating = model<number>();
     @ViewChild("addTourLogModal") addTourLogModalRef: ElementRef<HTMLDialogElement> | undefined;
-    @Input({required: true}) tour?: TourModel;
+    @Input({ required: true }) tourUuid!: string;
     @Output() refreshData = new EventEmitter<void>();
 
     constructor(private tourLogService: TourLogService, private toastr: ToastrService) {
@@ -54,7 +54,7 @@ export class TourLogsAddModal {
 
     createTourLog(): void {
         const logModel: TourLogModel = {
-            tour: this.tour!.uuid!,
+            tour: this.tourUuid,
             creationDate: this.creationDate(),
             totalTime: this.totalTime(),
             comment: this.comment(),

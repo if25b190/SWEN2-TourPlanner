@@ -1,7 +1,7 @@
 package at.fhtw.tourplanner.model;
 
 public enum TransportType {
-    Bicycle("cyling-regular"),
+    Bicycle("cycling-regular"),
     Running("foot-walking"),
     Hiking("foot-hiking");
 

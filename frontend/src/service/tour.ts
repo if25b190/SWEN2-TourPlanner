@@ -121,4 +121,24 @@ export class TourService {
       }
     });
   }
+
+  uploadJsonFile(file: File, callback: () => void, errorCallback: () => void = () => {}) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post(`${this.baseApiUrl}/api/v1/tours/import`, formData, {
+      observe: 'response',
+      responseType: 'text',
+      withCredentials: true,
+    }).subscribe({
+      next: () => {
+        callback();
+      },
+      error: (err: HttpResponse<String>) => {
+        console.error(err);
+        this.toastr.error("Failed to upload JSON file!");
+        errorCallback();
+      }
+    });
+  }
 }

@@ -107,7 +107,6 @@ export class TourEditModal implements OnInit, OnDestroy {
         }
         this.tourService.updateTour(tourModel, (tour) => {
             this.toastr.success("Tour updated!");
-            this.clearTourForm();
             this.editTourModalRef?.nativeElement.close();
             this.refreshData.emit();
         });
@@ -120,13 +119,5 @@ export class TourEditModal implements OnInit, OnDestroy {
         this.destination.set(tour.to);
         const transportType = this.transportTypes.indexOf(tour.transportType ?? "");
         this.transportType.set(transportType != -1 ? transportType : 0);
-    }
-
-    clearTourForm(): void {
-        this.tourName.set("");
-        this.description.set("");
-        this.start.set(undefined);
-        this.destination.set(undefined);
-        this.transportType.set(0);
     }
 }

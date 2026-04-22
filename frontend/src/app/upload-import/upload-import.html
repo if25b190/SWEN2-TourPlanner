@@ -1,0 +1,15 @@
+<label class="btn"
+       [class.btn-disabled]="isUploadingFile()"
+       aria-label="Upload tour image">
+    @if (isUploadingFile()) {
+        <span class="loading loading-spinner loading-xs"></span>
+    } @else {
+        <span>Import</span>
+    }
+    <input class="hidden"
+           type="file"
+           accept="application/json"
+           [disabled]="isUploadingFile()"
+           (change)="onJsonFileSelected($event)"
+           (click)="$event.stopPropagation()"/>
+</label>
