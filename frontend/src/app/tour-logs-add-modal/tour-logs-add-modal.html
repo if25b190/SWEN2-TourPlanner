@@ -16,7 +16,7 @@
             <fieldset class="fieldset my-2">
                 <legend class="fieldset-legend">Total Time</legend>
                 <label class="input">
-                    <input type="time" placeholder="Total Time" [(ngModel)]="totalTime" required/>
+                    <input type="time" placeholder="Total Time" step="3600" [(ngModel)]="totalTime" required/>
                 </label>
             </fieldset>
             <div class="validator-hint mb-3 form-error" [style.display]="(isTotalTimeValid()) ? 'none' : 'block'">

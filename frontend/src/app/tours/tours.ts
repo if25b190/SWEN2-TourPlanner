@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, model} from '@angular/core';
+import {AfterViewInit, Component, signal, WritableSignal} from '@angular/core';
 import {TourService} from "../../service/tour";
 import {FormsModule} from "@angular/forms";
 import * as leaflet from "leaflet";
@@ -8,8 +8,17 @@ import {TourModel} from "../../model/m_tour";
 import {TourEditModal} from "../tour-edit-modal/tour-edit-modal";
 import {TourDeleteModal} from "../tour-delete-modal/tour-delete-modal";
 import {TourLogs} from "../tour-logs/tour-logs";
-import {TourLogsAddModal} from "../tour-logs-add-modal/tour-logs-add-modal";
 import {ToastrService} from "ngx-toastr";
+import {DistancePipe} from "../../pipe/distance-pipe";
+import {environment} from "../../environments/environment";
+import {UploadImport} from "../upload-import/upload-import";
+
+const MARKER_ICON = leaflet.divIcon({
+    className: '',
+    html: `<div style="background:#2a64c5;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+});
 
 @Component({
     selector: 'app-tours',
@@ -19,20 +28,23 @@ import {ToastrService} from "ngx-toastr";
         TourEditModal,
         TourDeleteModal,
         TourLogs,
-        TourLogsAddModal
+        DistancePipe,
+        UploadImport
     ],
     templateUrl: './tours.html',
     styleUrl: './tours.scss',
 })
 export class Tours implements AfterViewInit {
+    readonly baseApiUrl = environment.baseApiUrl;
     private map!: leaflet.Map;
     private marker?: leaflet.Marker;
     private tourMarkers: leaflet.Marker[] = [];
     private tourRouteLine?: leaflet.Polyline;
-    selectedTour = model<TourModel>();
+    private tourRouteLines?: leaflet.Polyline[];
+    selectedTour = signal<TourModel | undefined>(undefined);
     selectingLocation = false;
     selectedLocation: Subject<{ latitude: number, longitude: number }> = new Subject();
-    tourData: TourModel[] = [];
+    tourData: WritableSignal<TourModel[]> = signal([]);
     private readonly uploadingTourUuids = new Set<string>();
     private readonly tourImageVersions: Record<string, number> = {};
 
@@ -51,7 +63,7 @@ export class Tours implements AfterViewInit {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(this.map);
 
-        leaflet.marker([48.2082, 16.3738])
+        leaflet.marker([48.2082, 16.3738], {icon: MARKER_ICON})
             .addTo(this.map)
             .bindPopup('Vienna')
             .openPopup();
@@ -66,7 +78,7 @@ export class Tours implements AfterViewInit {
                 this.map.removeLayer(this.marker);
             }
 
-            this.marker = leaflet.marker([lat, lng]).addTo(this.map);
+            this.marker = leaflet.marker([lat, lng], {icon: MARKER_ICON}).addTo(this.map);
 
             console.log('Selected location:', this.selectedLocation);
 
@@ -83,7 +95,9 @@ export class Tours implements AfterViewInit {
         this.tourService.searchTours(searchTerm, tours => {
             console.log("TOUR DATA");
             console.log(tours);
-            this.tourData = tours;
+            this.tourData.set(tours);
+            this.selectedTour.set(undefined);
+            this.clearTourMarkers();
         });
     }
 
@@ -91,26 +105,28 @@ export class Tours implements AfterViewInit {
         this.tourService.fetchAllTours(tours => {
             console.log("TOUR DATA");
             console.log(tours);
-            this.tourData = tours;
+            this.tourData.set(tours);
+            this.selectedTour.set(undefined);
+            this.clearTourMarkers();
         });
     }
 
     getTourImageUrl(tour: TourModel): string {
         if (!tour.uuid) {
-            return this.getTourImageFallbackUrl(tour);
+            return this.getTourImageFallbackUrl();
         }
 
         return this.tourService.getTourFileUrl(tour.uuid, this.tourImageVersions[tour.uuid] ?? 0);
     }
 
-    getTourImageFallbackUrl(tour: TourModel): string {
-        return `https://picsum.photos/seed/${encodeURIComponent(tour.uuid ?? tour.name ?? 'tour')}/536/354`;
+    getTourImageFallbackUrl(): string {
+        return `missing.png`;
     }
 
-    onTourImageError(event: Event, tour: TourModel): void {
+    onTourImageError(event: Event): void {
         const image = event.target as HTMLImageElement;
         image.onerror = null;
-        image.src = this.getTourImageFallbackUrl(tour);
+        image.src = this.getTourImageFallbackUrl();
     }
 
     onTourFileSelected(tour: TourModel, event: Event): void {
@@ -213,6 +229,18 @@ export class Tours implements AfterViewInit {
                 .addTo(this.map);
         }
 
+        const wayPoints: leaflet.Polyline[] = [];
+        if (tour.wayPoints) {
+            for (let i = 0; i + 1 < tour.wayPoints.length; i++) {
+                const wp = tour.wayPoints[i];
+                const wpNext = tour.wayPoints[i + 1];
+                const tempLine: leaflet.LatLngTuple[] = [[wp[1], wp[0]], [wpNext[1], wpNext[0]]];
+                wayPoints.push(leaflet.polyline(tempLine, {color: '#c52246', weight: 3, dashArray: '6 6'})
+                    .addTo(this.map));
+            }
+        }
+        this.tourRouteLines = wayPoints;
+
         this.map.fitBounds(leaflet.latLngBounds(points), {padding: [48, 48]});
     }
 
@@ -222,6 +250,12 @@ export class Tours implements AfterViewInit {
         if (this.tourRouteLine) {
             this.map.removeLayer(this.tourRouteLine);
             this.tourRouteLine = undefined;
+        }
+        if (this.tourRouteLines) {
+            for (const line of this.tourRouteLines) {
+                this.map.removeLayer(line);
+            }
+            this.tourRouteLines = undefined;
         }
     }
 }

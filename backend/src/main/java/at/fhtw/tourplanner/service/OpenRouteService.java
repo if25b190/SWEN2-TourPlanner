@@ -33,8 +33,8 @@ public class OpenRouteService {
                     .uri(URI.create("https://api.openrouteservice.org/v2/directions/"
                             + tour.getTransportType().label
                             + "?api_key="+openRouteApiKey
-                            + "&start="+tour.getFrom().getLatitude()+","+tour.getFrom().getLongitude()
-                            + "&end="+tour.getTo().getLatitude()+","+tour.getTo().getLongitude()))
+                            + "&start="+tour.getFrom().getLongitude()+","+tour.getFrom().getLatitude()
+                            + "&end="+tour.getTo().getLongitude()+","+tour.getTo().getLatitude()))
                     .GET()
                     .build();
 

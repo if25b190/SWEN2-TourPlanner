@@ -1,7 +1,9 @@
+<app-tour-logs-add-modal [tourUuid]="tourUuid" (refreshData)="fetchAllTourLogs()">
+</app-tour-logs-add-modal>
 <div class="bg-base-100 rounded-box shadow-md p-4">
-    <h2 class="text-lg font-bold mb-3">{{ tourLogs.length }} Tour Logs</h2>
+    <h2 class="text-lg font-bold mb-3">{{ tourLogs().length }} Tour Logs</h2>
     <ul class="flex flex-col gap-2">
-        @for (tourLog of tourLogs; track tourLog.uuid) {
+        @for (tourLog of tourLogs(); track tourLog.uuid) {
             <li class="rounded-box shadow-sm border border-base-300 hover:bg-base-200 transition-colors p-3">
 
                 <!-- Top row: creator + date on left, actions on right -->
@@ -40,7 +42,7 @@
                     <div class="bg-base-300 rounded-box p-2">
                         <div class="text-xs uppercase font-semibold opacity-60 mb-0.5">Rating</div>
                         <div class="rating rating-sm pointer-events-none">
-                            @for (star of [1,2,3,4,5]; track star) {
+                            @for (star of [1, 2, 3, 4, 5]; track star) {
                                 <input type="radio" class="mask mask-star-2 bg-orange-400"
                                        [checked]="tourLog.rating === star" disabled/>
                             }
