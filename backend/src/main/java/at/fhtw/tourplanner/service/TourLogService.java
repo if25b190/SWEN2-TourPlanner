@@ -72,7 +72,7 @@ public class TourLogService {
                 .map(TourLogDto::fromEntity);
     }
 
-    public Optional<Integer> deleteTour(UUID uuid, Account account) {
+    public Optional<Integer> deleteTourLog(UUID uuid, Account account) {
         return tourLogRepository.getTourLogByUuid(uuid)
                 .filter(log -> log.getCreator().getUuid().equals(account.getUuid()))
                 .map(log -> {
