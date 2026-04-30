@@ -70,7 +70,7 @@ public class TourLogController {
     @DeleteMapping("/logs/{uuid}")
     public ResponseEntity<String> deleteTourLog(@PathVariable String uuid, Authentication authentication) {
         var account = PrincipalCheckUtil.getPrincipal(authentication);
-        var result = tourLogService.deleteTour(UUID.fromString(uuid), account);
+        var result = tourLogService.deleteTourLog(UUID.fromString(uuid), account);
         if (result.isPresent()) {
             return ResponseEntity.ok(null);
         } else {

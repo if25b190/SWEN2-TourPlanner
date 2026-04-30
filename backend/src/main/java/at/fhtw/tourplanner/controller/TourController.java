@@ -78,7 +78,7 @@ public class TourController {
         var account = PrincipalCheckUtil.getPrincipal(authentication);
         var result = tourService.deleteTour(UUID.fromString(uuid), account);
         if (result.isPresent()) {
-            return ResponseEntity.ok(null);
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
