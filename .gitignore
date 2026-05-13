@@ -1,4 +1,6 @@
 .idea
 *.mv.db
+*.trace.db
 upload-dir
 .env
+backend/src/main/static/

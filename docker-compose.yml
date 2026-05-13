@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: ./Dockerfile
+      context: .
+      dockerfile: ./backend/Dockerfile
     restart: unless-stopped
     depends_on:
       db:
@@ -11,14 +11,6 @@ services:
       - "8080:8080"
     env_file:
       - .env
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: ./Dockerfile
-      network: host
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
   db:
     image: postgres:16
     restart: unless-stopped

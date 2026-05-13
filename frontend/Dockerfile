@@ -19,8 +19,8 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 # Copy the rest of the application source code into the container
 COPY . .
 
-# Build the Angular application
-RUN npm run build
+# Build the Angular application for this standalone Nginx image.
+RUN npm run build -- --output-path dist
 
 # =========================================
 # Stage 2: Prepare Nginx to Serve Static Files
