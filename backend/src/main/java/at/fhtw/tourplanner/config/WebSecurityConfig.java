@@ -70,9 +70,14 @@ public class WebSecurityConfig {
                         .requestMatchers("/h2-console/**")
                         .hasRole("ADMIN")
                         .requestMatchers(
+                                "/api/v1/login",
                                 "/api/v1/register"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/demo/**")
+                        .permitAll()
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .requestMatchers("/**").permitAll()
                 )
                 .formLogin(conf -> conf
                         .successHandler((req, res, auth) -> {

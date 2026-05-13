@@ -49,7 +49,11 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "outputPath": {
+                "base": "../backend/src/main/resources/static/",
+                "browser": ""
+              }
             },
             "development": {
               "optimization": false,
@@ -60,7 +64,11 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.development.ts"
                 }
-              ]
+              ],
+              "outputPath": {
+                "base": "../backend/src/main/resources/static/",
+                "browser": ""
+              }
             }
           },
           "defaultConfiguration": "production"

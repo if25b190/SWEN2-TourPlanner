@@ -1,5 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -8,9 +9,11 @@ import { Component } from '@angular/core';
   styleUrl: './profile.scss',
 })
 export class Profile {
+  private readonly baseApiUrl = environment.baseApiUrl;
+
   constructor(private http: HttpClient) {
     this.http
-      .get('http://localhost:8080/api/v1/profile', {
+      .get(`${this.baseApiUrl}/api/v1/profile`, {
         observe: 'response',
         responseType: 'text',
         withCredentials: true,
