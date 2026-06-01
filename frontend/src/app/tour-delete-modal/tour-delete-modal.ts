@@ -26,10 +26,16 @@ export class TourDeleteModal {
       this.toastr.error("UUID is missing!");
       return;
     }
-    this.tourService.deleteTour(this.tourData.uuid, () => {
-      this.toastr.success("Tour deleted!");
-      this.deleteTourModal?.nativeElement.close();
-      this.refreshData.emit();
+    this.tourService.deleteTour(this.tourData.uuid).subscribe({
+      next: () => {
+        this.toastr.success("Tour deleted!");
+        this.deleteTourModal?.nativeElement.close();
+        this.refreshData.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to delete tour!");
+      }
     });
   }
 }

@@ -16,7 +16,7 @@
             <fieldset class="fieldset my-2">
                 <legend class="fieldset-legend">Total Time</legend>
                 <label class="input">
-                    <input type="time" placeholder="Total Time" step="3600" [(ngModel)]="totalTime" required/>
+                    <input type="number" placeholder="Total Time in minutes" min="1" step="1" [(ngModel)]="totalTime" required/>
                 </label>
             </fieldset>
             <div class="validator-hint mb-3 form-error" [style.display]="(isTotalTimeValid()) ? 'none' : 'block'">
@@ -50,7 +50,7 @@
             <fieldset class="fieldset my-2">
                 <legend class="fieldset-legend">Rating</legend>
                 <div class="rating rating-lg">
-                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                    @for (star of ratings; track star) {
                         <input type="radio"
                                name="rating"
                                class="mask mask-star-2 bg-orange-400"

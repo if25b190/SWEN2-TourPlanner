@@ -100,11 +100,17 @@ export class TourModal implements OnInit, OnDestroy {
       to: this.destination(),
       transportType: this.transportTypes[this.transportType()]
     }
-    this.tourService.createTour(tourModel, (tour) => {
-      this.toastr.success("Tour added!");
-      this.clearTourForm();
-      this.addTourModalRef?.nativeElement.close();
-      this.refreshData.emit();
+    this.tourService.createTour(tourModel).subscribe({
+      next: () => {
+        this.toastr.success("Tour added!");
+        this.clearTourForm();
+        this.addTourModalRef?.nativeElement.close();
+        this.refreshData.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to create tour!");
+      }
     });
   }
 

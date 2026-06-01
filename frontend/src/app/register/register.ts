@@ -14,9 +14,9 @@ import {Router, RouterLink} from "@angular/router";
     styleUrl: './register.scss'
 })
 export class Register {
-    username = model<String>('');
-    password = model<String>('');
-    passwordConfirm = model<String>('');
+    username = model<string>('');
+    password = model<string>('');
+    passwordConfirm = model<string>('');
 
     constructor(private router: Router, private auth: AuthService, private toastr: ToastrService) {
     }
@@ -38,14 +38,17 @@ export class Register {
     }
 
     register() {
-        this.auth.register(this.username(), this.password(), res => {
-            if (res.status === 201) {
+        this.auth.register(this.username(), this.password()).subscribe({
+            next: () => {
                 this.toastr.success("Account registered successfully!");
                 this.router.navigate(['/login']);
-            } else if (res.status === 400) {
-                this.toastr.error("Account already exists!");
-            } else {
-                this.toastr.error("Server error!");
+            },
+            error: (err) => {
+                if (err.status === 400) {
+                    this.toastr.error("Account already exists!");
+                } else {
+                    this.toastr.error("Server error!");
+                }
             }
         });
     }

@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../environments/environment";
-import {HttpClient, HttpResponse} from "@angular/common/http";
-import {ToastrService} from "ngx-toastr";
 import {TourLogModel} from "../model/m_tourlog";
+import {HttpClient} from "@angular/common/http";
+import {map, Observable} from "rxjs";
+
+type TourLogApiModel = Omit<TourLogModel, 'totalTime'> & {
+  totalTime?: string;
+};
 
 @Injectable({
   providedIn: 'root',
@@ -10,73 +14,64 @@ import {TourLogModel} from "../model/m_tourlog";
 export class TourLogService {
   private readonly baseApiUrl = environment.baseApiUrl;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {
+  constructor(private http: HttpClient) {
   }
 
-  fetchAllTourLogs(uuid: string, callback: (tour_logs: TourLogModel[]) => void) {
-    this.http.get(`${this.baseApiUrl}/api/v1/tours/${uuid}/logs`, {
-      observe: 'response',
-      responseType: 'json',
+  fetchAllTourLogs(uuid: string): Observable<TourLogModel[]> {
+    return this.http.get<TourLogApiModel[]>(`${this.baseApiUrl}/api/v1/tours/${uuid}/logs`, {
       withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourLogModel[];
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to fetch tourlogs!");
-      }
+    }).pipe(map((logs) => logs.map((log) => this.fromApiModel(log))));
+  }
+
+  createTourLog(tourLog: TourLogModel): Observable<TourLogModel> {
+    return this.http.post<TourLogApiModel>(`${this.baseApiUrl}/api/v1/logs`, this.toApiModel(tourLog), {
+      withCredentials: true,
+    }).pipe(map((log) => this.fromApiModel(log)));
+  }
+
+  updateTourLog(tourLog: TourLogModel): Observable<TourLogModel> {
+    return this.http.put<TourLogApiModel>(`${this.baseApiUrl}/api/v1/logs`, this.toApiModel(tourLog), {
+      withCredentials: true,
+    }).pipe(map((log) => this.fromApiModel(log)));
+  }
+
+  deleteTourLog(uuid: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseApiUrl}/api/v1/logs/${uuid}`, {
+      withCredentials: true,
     });
   }
 
-  createTourLog(tour_log: TourLogModel, callback: (tour_log: TourLogModel) => void) {
-    this.http.post(`${this.baseApiUrl}/api/v1/logs`, tour_log, {
-      observe: 'response',
-      responseType: 'json',
-      withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourLogModel;
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to create tourlog!");
-      }
-    });
+  private fromApiModel(log: TourLogApiModel): TourLogModel {
+    return {
+      ...log,
+      totalTime: this.parseTotalTime(log.totalTime),
+    };
   }
 
-  updateTourLog(tour_log: TourLogModel, callback: (tour_log: TourLogModel) => void) {
-    this.http.put(`${this.baseApiUrl}/api/v1/logs`, tour_log, {
-      observe: 'response',
-      responseType: 'json',
-      withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourLogModel;
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to update tourlog!");
-      }
-    });
+  private toApiModel(log: TourLogModel): TourLogApiModel {
+    return {
+      ...log,
+      totalTime: this.formatTotalTime(log.totalTime),
+    };
   }
 
-  deleteTourLog(uuid: string, callback: () => void) {
-    this.http.delete(`${this.baseApiUrl}/api/v1/logs/${uuid}`, {
-      observe: 'response',
-      responseType: 'text',
-      withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<String>) => {
-        callback();
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to delete tourlog!");
-      }
-    });
+  private parseTotalTime(totalTime: string | undefined): number | undefined {
+    if (!totalTime) {
+      return undefined;
+    }
+
+    const [hours = 0, minutes = 0, seconds = 0] = totalTime.split(':').map(Number);
+    return hours * 60 + minutes + Math.round(seconds / 60);
+  }
+
+  private formatTotalTime(totalTime: number | undefined): string | undefined {
+    if (totalTime == undefined) {
+      return undefined;
+    }
+
+    const roundedTotalTime = Math.floor(totalTime);
+    const hours = Math.floor(roundedTotalTime / 60);
+    const minutes = roundedTotalTime % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
   }
 }

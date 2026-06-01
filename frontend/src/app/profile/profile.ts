@@ -19,12 +19,12 @@ export class Profile {
         withCredentials: true,
       })
       .subscribe({
-        next: (res: HttpResponse<String>) => {
+        next: (res: HttpResponse<string>) => {
           console.log('PROFILE DEBUG:');
           console.log(res.status);
           console.log(res.body);
         },
-        error: (err: HttpResponse<String>) => {
+        error: (err: HttpResponse<string>) => {
           console.error(err);
         },
       });

@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import {environment} from "../environments/environment";
-import {HttpClient, HttpResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {TourModel} from "../model/m_tour";
-import {ToastrService} from "ngx-toastr";
+import {map, Observable} from "rxjs";
+
+interface PageResponse<T> {
+  content: T[];
+}
 
 @Injectable({
   providedIn: 'root',
@@ -10,90 +14,36 @@ import {ToastrService} from "ngx-toastr";
 export class TourService {
   private readonly baseApiUrl = environment.baseApiUrl;
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {
+  constructor(private http: HttpClient) {
   }
 
-  searchTours(searchTerm: string, callback: (tours: TourModel[]) => void) {
-    this.http.get(`${this.baseApiUrl}/api/v1/tours/search/${searchTerm}?size=9999`, {
-      observe: 'response',
-      responseType: 'json',
+  searchTours(searchTerm: string): Observable<TourModel[]> {
+    return this.http.get<PageResponse<TourModel>>(`${this.baseApiUrl}/api/v1/tours/search/${encodeURIComponent(searchTerm)}`, {
       withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = (res.body as any).content as TourModel[];
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to fetch tours!");
-      }
+    }).pipe(map((res) => res.content));
+  }
+
+  fetchAllTours(): Observable<TourModel[]> {
+    return this.http.get<TourModel[]>(`${this.baseApiUrl}/api/v1/tours`, {
+      withCredentials: true,
     });
   }
 
-  fetchAllTours(callback: (tours: TourModel[]) => void) {
-    this.http.get(`${this.baseApiUrl}/api/v1/tours`, {
-      observe: 'response',
-      responseType: 'json',
+  createTour(tour: TourModel): Observable<TourModel> {
+    return this.http.post<TourModel>(`${this.baseApiUrl}/api/v1/tours`, tour, {
       withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourModel[];
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to fetch tours!");
-      }
     });
   }
 
-  createTour(tour: TourModel, callback: (tour: TourModel) => void) {
-    this.http.post(`${this.baseApiUrl}/api/v1/tours`, tour, {
-      observe: 'response',
-      responseType: 'json',
+  updateTour(tour: TourModel): Observable<TourModel> {
+    return this.http.put<TourModel>(`${this.baseApiUrl}/api/v1/tours`, tour, {
       withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourModel;
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to create tour!");
-      }
     });
   }
 
-  updateTour(tour: TourModel, callback: (tour: TourModel) => void) {
-    this.http.put(`${this.baseApiUrl}/api/v1/tours`, tour, {
-      observe: 'response',
-      responseType: 'json',
+  deleteTour(uuid: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseApiUrl}/api/v1/tours/${uuid}`, {
       withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<Object>) => {
-        const data = res.body as TourModel;
-        callback(data);
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to update tour!");
-      }
-    });
-  }
-
-  deleteTour(uuid: string, callback: () => void) {
-    this.http.delete(`${this.baseApiUrl}/api/v1/tours/${uuid}`, {
-      observe: 'response',
-      responseType: 'text',
-      withCredentials: true,
-    }).subscribe({
-      next: (res: HttpResponse<String>) => {
-        callback();
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to delete tour!");
-      }
     });
   }
 
@@ -102,43 +52,23 @@ export class TourService {
     return version > 0 ? `${url}?v=${version}` : url;
   }
 
-  uploadTourFile(uuid: string, file: File, callback: () => void, errorCallback: () => void = () => {}) {
+  uploadTourFile(uuid: string, file: File): Observable<void> {
     const formData = new FormData();
     formData.append('file', file);
 
-    this.http.post(`${this.baseApiUrl}/api/v1/files/${uuid}`, formData, {
-      observe: 'response',
+    return this.http.post(`${this.baseApiUrl}/api/v1/files/${uuid}`, formData, {
       responseType: 'text',
       withCredentials: true,
-    }).subscribe({
-      next: () => {
-        callback();
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to upload tour image!");
-        errorCallback();
-      }
-    });
+    }).pipe(map(() => void 0));
   }
 
-  uploadJsonFile(file: File, callback: () => void, errorCallback: () => void = () => {}) {
+  uploadJsonFile(file: File): Observable<void> {
     const formData = new FormData();
     formData.append('file', file);
 
-    this.http.post(`${this.baseApiUrl}/api/v1/tours/import`, formData, {
-      observe: 'response',
+    return this.http.post(`${this.baseApiUrl}/api/v1/tours/import`, formData, {
       responseType: 'text',
       withCredentials: true,
-    }).subscribe({
-      next: () => {
-        callback();
-      },
-      error: (err: HttpResponse<String>) => {
-        console.error(err);
-        this.toastr.error("Failed to upload JSON file!");
-        errorCallback();
-      }
-    });
+    }).pipe(map(() => void 0));
   }
 }

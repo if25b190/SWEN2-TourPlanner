@@ -2,84 +2,57 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {environment} from "../environments/environment";
+import {BehaviorSubject, catchError, finalize, map, Observable, of, tap} from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private readonly baseApiUrl = environment.baseApiUrl;
+    private readonly loggedInSubject = new BehaviorSubject<boolean>(false);
+    readonly loggedIn$ = this.loggedInSubject.asObservable();
 
     constructor(private router: Router, private http: HttpClient) {
     }
 
-    register(username: String, password: String, callback: (res: HttpResponse<String>) => void) {
-        this.http.post(`${this.baseApiUrl}/api/v1/register`, {
+    register(username: string, password: string): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseApiUrl}/api/v1/register`, {
             username: username,
             password: password
         }, {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
-        }).subscribe({
-            next: (res: HttpResponse<String>) => {
-                callback(res);
-            },
-            error: (err: HttpResponse<String>) => {
-                callback(err);
-            }
         });
     }
 
-    login(username: String, password: String, isRemember: boolean, callback: (res: HttpResponse<String>) => void) {
+    login(username: string, password: string, isRemember: boolean): Observable<HttpResponse<string>> {
         let formData = new HttpParams()
-            .set('username', username as string)
-            .set('password', password as string);
+            .set('username', username)
+            .set('password', password);
         if (isRemember) {
             formData = formData.set('remember-me', 'on');
         }
-        this.http.post(`${this.baseApiUrl}/api/v1/login`, formData.toString(), {
+        return this.http.post(`${this.baseApiUrl}/api/v1/login`, formData.toString(), {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        }).subscribe({
-            next: (res: HttpResponse<String>) => {
-                if (isRemember) {
-                    localStorage.setItem("isLoggedIn", "true");
-                } else {
-                    sessionStorage.setItem("isLoggedIn", "true");
-                }
-                callback(res);
-            },
-            error: (err: HttpResponse<String>) => {
-                callback(err);
-            }
-        });
+        }).pipe(tap(() => this.loggedInSubject.next(true)));
     }
 
-    logout() {
-        this.http.get(`${this.baseApiUrl}/api/v1/logout`, {
+    logout(): Observable<HttpResponse<string>> {
+        return this.http.get(`${this.baseApiUrl}/api/v1/logout`, {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
-        }).subscribe({
-            complete: () => {
-                this.router.navigate(['/login']);
-                sessionStorage.removeItem("isLoggedIn");
-                localStorage.removeItem("isLoggedIn");
-            },
-            error: () => {
-                this.router.navigate(['/login']);
-                sessionStorage.removeItem("isLoggedIn");
-                localStorage.removeItem("isLoggedIn");
-            }
-        });
+        }).pipe(finalize(() => this.clearLoginState()));
     }
 
-    update(email: String, password: String, passwordOld: String, callback: (res: HttpResponse<String>) => void) {
-        this.http.post(`${this.baseApiUrl}/api/v1/profile`, {
+    update(email: string, password: string, passwordOld: string): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseApiUrl}/api/v1/profile`, {
             email: email,
             password: password,
             passwordOld: passwordOld
@@ -87,39 +60,35 @@ export class AuthService {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
-        }).subscribe({
-            next: (res) => {
-                if (res.status === 200) {
-                    if (localStorage.getItem("currentEmail")) {
-                        localStorage.setItem("currentEmail", email.toString());
-                    } else {
-                        sessionStorage.setItem("currentEmail", email.toString());
-                    }
-                }
-                callback(res);
-            },
-            error: (err: HttpResponse<String>) => {
-                callback(err);
-            }
         });
     }
 
-    delete(callback: (res: HttpResponse<String>) => void) {
-        this.http.delete(`${this.baseApiUrl}/api/v1/delete`, {
+    delete(): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseApiUrl}/api/v1/delete`, {
             observe: 'response',
             responseType: 'text',
             withCredentials: true,
-        }).subscribe({
-            next: (res: HttpResponse<String>) => {
-                callback(res);
-            },
-            error: (err: HttpResponse<String>) => {
-                callback(err);
-            }
-        });
+        }).pipe(tap(() => this.clearLoginState()));
+    }
+
+    refreshLoginState(): Observable<boolean> {
+        return this.http.get(`${this.baseApiUrl}/api/v1/profile`, {
+            observe: 'response',
+            responseType: 'text',
+            withCredentials: true,
+        }).pipe(
+            map(() => true),
+            catchError(() => of(false)),
+            tap((loggedIn) => this.loggedInSubject.next(loggedIn))
+        );
     }
 
     isLoggedIn(): boolean {
-        return sessionStorage.getItem("isLoggedIn") === "true" || localStorage.getItem("isLoggedIn") === "true";
+        return this.loggedInSubject.value;
+    }
+
+    private clearLoginState(): void {
+        this.loggedInSubject.next(false);
+        this.router.navigate(['/login']);
     }
 }

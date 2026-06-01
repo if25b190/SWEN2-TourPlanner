@@ -105,10 +105,16 @@ export class TourEditModal implements OnInit, OnDestroy {
             to: this.destination(),
             transportType: this.transportTypes[this.transportType()]
         }
-        this.tourService.updateTour(tourModel, (tour) => {
-            this.toastr.success("Tour updated!");
-            this.editTourModalRef?.nativeElement.close();
-            this.refreshData.emit();
+        this.tourService.updateTour(tourModel).subscribe({
+            next: () => {
+                this.toastr.success("Tour updated!");
+                this.editTourModalRef?.nativeElement.close();
+                this.refreshData.emit();
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to update tour!");
+            }
         });
     }
 

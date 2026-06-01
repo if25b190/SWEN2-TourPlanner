@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {Theme} from "../theme/theme";
-import {NgIcon} from "@ng-icons/core";
 import {AuthService} from "../../service/auth";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app-appbar',
@@ -14,14 +14,18 @@ import {AuthService} from "../../service/auth";
   styleUrl: './appbar.scss'
 })
 export class Appbar {
-    constructor(private auth: AuthService) {
-    }
+    private readonly auth = inject(AuthService);
+    readonly loggedIn = toSignal(this.auth.loggedIn$, {initialValue: this.auth.isLoggedIn()});
 
     isLogged(): boolean {
-        return this.auth.isLoggedIn();
+        return this.loggedIn();
     }
 
     logout() {
-        this.auth.logout();
+        this.auth.logout().subscribe({
+            error: (err) => {
+                console.error(err);
+            }
+        });
     }
 }

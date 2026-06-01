@@ -15,8 +15,8 @@ import {ToastrService} from "ngx-toastr";
   styleUrl: './login.scss',
 })
 export class Login {
-  username = model<String>('');
-  password = model<String>('');
+  username = model<string>('');
+  password = model<string>('');
   isRemember = model<boolean>(false);
 
   constructor(private router: Router, private auth: AuthService, private toastr: ToastrService) {
@@ -35,14 +35,17 @@ export class Login {
   }
 
   login() {
-    this.auth.login(this.username(), this.password(), this.isRemember(), res => {
-      if (res.status === 400 || (res.body && res.body.includes("Account not found"))) {
-        this.toastr.error("Invalid username or password!");
-      } else if (res.status === 200) {
+    this.auth.login(this.username(), this.password(), this.isRemember()).subscribe({
+      next: () => {
         this.router.navigate(['/']);
         this.toastr.success("Logged in successfully!");
-      } else {
-        this.toastr.error("Server error!");
+      },
+      error: (err) => {
+        if (err.status === 400 || (typeof err.error === "string" && err.error.includes("Account not found"))) {
+          this.toastr.error("Invalid username or password!");
+        } else {
+          this.toastr.error("Server error!");
+        }
       }
     });
   }
