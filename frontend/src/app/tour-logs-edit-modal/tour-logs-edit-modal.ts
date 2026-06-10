@@ -1,7 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, model, OnInit, Output, ViewChild} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {FormsModule} from "@angular/forms";
-import {Difficulty, TourLogModel} from "../../model/m_tourlog";
+import {Difficulty, TourLogModel, TourLogRating, TourLogRatings} from "../../model/m_tourlog";
 import {TourLogService} from "../../service/tour_log";
 
 @Component({
@@ -14,12 +14,13 @@ import {TourLogService} from "../../service/tour_log";
 })
 export class TourLogsEditModal implements OnInit {
   readonly difficulties: string[] = [];
+  readonly ratings = TourLogRatings;
   creationDate = model<Date>();
-  totalTime = model<Date>();
+  totalTime = model<number>();
   comment = model<string>("");
   distance = model<number>(0);
   difficulty = model<number>(0);
-  rating = model<number>();
+  rating = model<TourLogRating>();
   @ViewChild("editTourLogModal") editTourLogModalRef: ElementRef<HTMLDialogElement> | undefined;
   @Input({required: true}) tourLogData?: TourLogModel;
   @Output() refreshData = new EventEmitter<void>();
@@ -51,7 +52,8 @@ export class TourLogsEditModal implements OnInit {
   }
 
   isTotalTimeValid(): boolean {
-    return this.totalTime() != undefined;
+    const time = this.totalTime();
+    return time != undefined && Number.isInteger(time) && time > 0;
   }
 
   isDistanceValid(): boolean {
@@ -59,8 +61,7 @@ export class TourLogsEditModal implements OnInit {
   }
 
   isRatingValid(): boolean {
-    const r = this.rating();
-    return r != undefined && r >= 1 && r <= 5;
+    return this.rating() != undefined;
   }
 
   isFormValid(): boolean {
@@ -78,10 +79,16 @@ export class TourLogsEditModal implements OnInit {
       difficulty: this.difficulties[this.difficulty()],
       rating: this.rating()
     }
-    this.tourLogService.updateTourLog(logModel, () => {
-      this.toastr.success("Tour log updated!");
-      this.editTourLogModalRef?.nativeElement.close();
-      this.refreshData.emit();
+    this.tourLogService.updateTourLog(logModel).subscribe({
+      next: () => {
+        this.toastr.success("Tour log updated!");
+        this.editTourLogModalRef?.nativeElement.close();
+        this.refreshData.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastr.error("Failed to update tourlog!");
+      }
     });
   }
 }

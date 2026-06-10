@@ -41,10 +41,17 @@ export class UploadImport {
             input.value = "";
         };
 
-        this.tourService.uploadJsonFile(file, () => {
-            this.toastr.success("Tours imported!");
-            this.refreshData.emit();
-            clearUploadState();
-        }, clearUploadState);
+        this.tourService.uploadJsonFile(file).subscribe({
+            next: () => {
+                this.toastr.success("Tours imported!");
+                this.refreshData.emit();
+                clearUploadState();
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to upload JSON file!");
+                clearUploadState();
+            }
+        });
     }
 }

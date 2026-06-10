@@ -1,8 +1,7 @@
 import {Component, ElementRef, EventEmitter, Input, model, Output, ViewChild} from '@angular/core';
-import {TourModel} from "../../model/m_tour";
 import {ToastrService} from "ngx-toastr";
 import {FormsModule} from "@angular/forms";
-import {Difficulty, TourLogModel} from "../../model/m_tourlog";
+import {Difficulty, TourLogModel, TourLogRating, TourLogRatings} from "../../model/m_tourlog";
 import {TourLogService} from "../../service/tour_log";
 
 @Component({
@@ -15,12 +14,13 @@ import {TourLogService} from "../../service/tour_log";
 })
 export class TourLogsAddModal {
     readonly difficulties: string[] = [];
+    readonly ratings = TourLogRatings;
     creationDate = model<Date>();
-    totalTime = model<Date>();
+    totalTime = model<number>();
     comment = model<string>("");
     distance = model<number>(0);
     difficulty = model<number>(0);
-    rating = model<number>();
+    rating = model<TourLogRating>();
     @ViewChild("addTourLogModal") addTourLogModalRef: ElementRef<HTMLDialogElement> | undefined;
     @Input({ required: true }) tourUuid!: string;
     @Output() refreshData = new EventEmitter<void>();
@@ -36,7 +36,8 @@ export class TourLogsAddModal {
     }
 
     isTotalTimeValid(): boolean {
-        return this.totalTime() != undefined;
+        const time = this.totalTime();
+        return time != undefined && Number.isInteger(time) && time > 0;
     }
 
     isDistanceValid(): boolean {
@@ -44,8 +45,7 @@ export class TourLogsAddModal {
     }
 
     isRatingValid(): boolean {
-        const r = this.rating();
-        return r != undefined && r >= 1 && r <= 5;
+        return this.rating() != undefined;
     }
 
     isFormValid(): boolean {
@@ -62,11 +62,17 @@ export class TourLogsAddModal {
             difficulty: this.difficulties[this.difficulty()],
             rating: this.rating()
         }
-        this.tourLogService.createTourLog(logModel, (tourLog) => {
-            this.toastr.success("Tour log added!");
-            this.clearTourLogForm();
-            this.addTourLogModalRef?.nativeElement.close();
-            this.refreshData.emit();
+        this.tourLogService.createTourLog(logModel).subscribe({
+            next: () => {
+                this.toastr.success("Tour log added!");
+                this.clearTourLogForm();
+                this.addTourLogModalRef?.nativeElement.close();
+                this.refreshData.emit();
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to create tourlog!");
+            }
         });
     }
 

@@ -92,23 +92,35 @@ export class Tours implements AfterViewInit {
             this.fetchAllTours();
             return;
         }
-        this.tourService.searchTours(searchTerm, tours => {
-            console.log("TOUR DATA");
-            console.log(tours);
-            this.tourData.set(tours);
-            this.selectedTour.set(undefined);
-            this.clearTourMarkers();
+        this.tourService.searchTours(searchTerm).subscribe({
+            next: (tours) => {
+                this.setTours(tours);
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to fetch tours!");
+            }
         });
     }
 
     fetchAllTours(): void {
-        this.tourService.fetchAllTours(tours => {
-            console.log("TOUR DATA");
-            console.log(tours);
-            this.tourData.set(tours);
-            this.selectedTour.set(undefined);
-            this.clearTourMarkers();
+        this.tourService.fetchAllTours().subscribe({
+            next: (tours) => {
+                this.setTours(tours);
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to fetch tours!");
+            }
         });
+    }
+
+    private setTours(tours: TourModel[]): void {
+        console.log("TOUR DATA");
+        console.log(tours);
+        this.tourData.set(tours);
+        this.selectedTour.set(undefined);
+        this.clearTourMarkers();
     }
 
     getTourImageUrl(tour: TourModel): string {
@@ -161,11 +173,18 @@ export class Tours implements AfterViewInit {
             input.value = "";
         };
 
-        this.tourService.uploadTourFile(tour.uuid, file, () => {
-            this.toastr.success("Tour image uploaded!");
-            this.tourImageVersions[tour.uuid!] = Date.now();
-            clearUploadState();
-        }, clearUploadState);
+        this.tourService.uploadTourFile(tour.uuid, file).subscribe({
+            next: () => {
+                this.toastr.success("Tour image uploaded!");
+                this.tourImageVersions[tour.uuid!] = Date.now();
+                clearUploadState();
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error("Failed to upload tour image!");
+                clearUploadState();
+            }
+        });
     }
 
     isTourFileUploading(tour: TourModel): boolean {

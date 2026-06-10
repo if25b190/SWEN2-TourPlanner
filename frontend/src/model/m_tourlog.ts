@@ -1,5 +1,3 @@
-import {TourModel} from "./m_tour";
-
 export const Difficulty = {
     Easy: 'Easy',
     Intermediate: 'Intermediate',
@@ -7,6 +5,9 @@ export const Difficulty = {
     Hell: 'Hell'
 } as const;
 export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty];
+
+export const TourLogRatings = [1, 2, 3, 4, 5] as const;
+export type TourLogRating = (typeof TourLogRatings)[number];
 
 export interface TourLogModel {
     uuid?: string,
@@ -16,6 +17,6 @@ export interface TourLogModel {
     comment?: string,
     difficulty?: string,
     distance?: number,
-    totalTime?: Date,
-    rating?: number
+    totalTime?: number,
+    rating?: TourLogRating
 }
